@@ -1,11 +1,26 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { game } from '$lib/stores/gameStore';
 	import { PROJECT_TYPES, FEATURE_POOLS, PRICE_RANGES, LAPTOP_TIERS, ADVERTISING_FEATURE, CATEGORY_FEATURE_POOLS, CATEGORIES_FOR_TYPE, CATEGORY_LABELS } from '$lib/engine/projects';
 	import { estimateWeeklyRevenue } from '$lib/engine/pricing';
 	import { availableWu } from '$lib/stores/derived';
 	import FeatureCheckList from '$lib/components/FeatureCheckList.svelte';
-	import type { ProjectType, ProjectCategory, ProjectFeature, Notification } from '$lib/types';
+	import type { ProjectType, ProjectCategory, ProjectFeature, Notification, Bug } from '$lib/types';
+
+	// Major release mode
+	const majorFromId = $derived(page.url.searchParams.get('majorFrom'));
+	const parentProject = $derived(
+		majorFromId ? ($game.projects.find((p) => p.id === majorFromId) ?? null) : null
+	);
+	const isMajorRelease = $derived(parentProject !== null);
+
+	// Compute next major version: "1.2" → "2.0"
+	const nextMajorVersion = $derived(
+		parentProject
+			? `${Math.floor(parseFloat(parentProject.version)) + 1}.0`
+			: '1.0'
+	);
 
 	let name = $state('');
 	let type = $state<ProjectType>('basic_website');
@@ -14,6 +29,25 @@
 	let pricingModel = $state<'one_time' | 'subscription'>('one_time');
 	let price = $state(5);
 	let selectedFeatureIds = $state<string[]>([]);
+
+	// Pre-fill from parent when in major release mode
+	$effect(() => {
+		if (parentProject) {
+			name = `${parentProject.name} ${nextMajorVersion.split('.')[0]}.0`;
+			type = parentProject.type;
+			category = parentProject.category;
+			pricingModel = parentProject.pricingModel;
+			price = parentProject.price;
+			// Pre-select all carried-over features + bug fix features
+			const carriedIds = parentProject.features
+				.filter((f) => f.status === 'complete')
+				.map((f) => f.id);
+			const bugFixIds = parentProject.bugs
+				.filter((b) => !b.fixed)
+				.map((b) => `bugfix_${b.id}`);
+			selectedFeatureIds = [...carriedIds, ...bugFixIds];
+		}
+	});
 
 	const completedResearch = $derived($game.research.completed);
 	const laptopTier = $derived($game.expenses.laptopTier);
@@ -53,18 +87,48 @@
 
 	const categoriesForType = $derived(CATEGORIES_FOR_TYPE[type] ?? []);
 
-	// Merge base + category + advertising features
-	const features = $derived(() => {
+	// Bug fix WU cost helper
+	function bugFixWuCost(bug: Bug): number {
+		return bug.severity === 'critical' ? 10 : bug.severity === 'major' ? 5 : 2;
+	}
+
+	// Merge base + category + advertising features, with major release modifications
+	const features = $derived.by(() => {
 		const base = FEATURE_POOLS[type] ?? [];
 		const catFeatures = category ? (CATEGORY_FEATURE_POOLS[type]?.[category] ?? []) : [];
-		return [...base, ...catFeatures, ADVERTISING_FEATURE];
+		let allFeatures = [...base, ...catFeatures, ADVERTISING_FEATURE];
+
+		if (isMajorRelease && parentProject) {
+			const completedIds = new Set(
+				parentProject.features.filter((f) => f.status === 'complete').map((f) => f.id)
+			);
+			// Halve WU cost for carried-over features
+			allFeatures = allFeatures.map((f) =>
+				completedIds.has(f.id) ? { ...f, wuCost: Math.max(1, Math.ceil(f.wuCost / 2)) } : f
+			);
+			// Add bug fix line items for each unfixed bug in parent
+			const bugFixFeatures = parentProject.bugs
+				.filter((b) => !b.fixed)
+				.map((b) => ({
+					id: `bugfix_${b.id}`,
+					name: `Fix: ${b.description}`,
+					description: `Bug fix (${b.severity}) — -$${b.revenueImpact}/wk removed`,
+					wuCost: bugFixWuCost(b),
+					revenueBoost: 0,
+					qualityBoost: 1,
+					unlockRequires: [] as string[]
+				}));
+			allFeatures = [...allFeatures, ...bugFixFeatures];
+		}
+
+		return allFeatures;
 	});
 
 	const priceRange = $derived(PRICE_RANGES[type][pricingModel === 'one_time' ? 'oneTime' : 'subscription']);
 
 	const totalWu = $derived(
 		PROJECT_TYPES[type].baseWu +
-			features()
+			features
 				.filter((f) => selectedFeatureIds.includes(f.id))
 				.reduce((s, f) => s + f.wuCost, 0)
 	);
@@ -72,7 +136,7 @@
 	const estimatedWeeks = $derived(wu > 0 ? Math.ceil(totalWu / wu) : 0);
 
 	const selectedFeatureRevenue = $derived(
-		features()
+		features
 			.filter((f) => selectedFeatureIds.includes(f.id))
 			.reduce((s, f) => s + f.revenueBoost, 0)
 	);
@@ -90,6 +154,9 @@
 
 	const hasActiveProject = $derived($game.projects.some((p) => p.status === 'in_development'));
 	const hasPatchJob = $derived($game.activePatchJob !== null);
+	const hasMajorReleaseInDev = $derived(
+		$game.projects.some((p) => p.isMajorRelease && p.status === 'in_development')
+	);
 
 	const canStart = $derived(
 		name.trim().length > 0 &&
@@ -97,7 +164,8 @@
 			category !== null &&
 			!hasActiveProject &&
 			!hasPatchJob &&
-			wu > 0
+			wu > 0 &&
+			(!isMajorRelease || !hasMajorReleaseInDev)
 	);
 
 	function toggleFeature(id: string) {
@@ -121,7 +189,7 @@
 	function startProject() {
 		if (!canStart || !category) return;
 
-		const allFeatures = features();
+		const allFeatures = features;
 		const selectedFeatures: ProjectFeature[] = allFeatures
 			.filter((f) => selectedFeatureIds.includes(f.id))
 			.map((f) => ({
@@ -131,6 +199,8 @@
 			}));
 
 		const id = crypto.randomUUID();
+		const version = isMajorRelease ? nextMajorVersion : '1.0';
+		const parentId = isMajorRelease ? (majorFromId ?? null) : null;
 
 		game.update((s) => ({
 			...s,
@@ -167,9 +237,9 @@
 					bugAccumulator: 0,
 					totalBugsFixed: 0,
 					lastPatchedWeek: null,
-					version: '1.0',
-					parentProjectId: null,
-					isMajorRelease: false,
+					version,
+					parentProjectId: parentId,
+					isMajorRelease,
 					archivedWeek: null
 				}
 			],
@@ -177,7 +247,9 @@
 				{
 					id: crypto.randomUUID(),
 					week: s.meta.week,
-					message: `🛠 Started "${name.trim()}" — ${estimatedWeeks} weeks estimated.`,
+					message: isMajorRelease
+						? `📦 Major Release "${name.trim()}" started — ${estimatedWeeks} weeks estimated.`
+						: `🛠 Started "${name.trim()}" — ${estimatedWeeks} weeks estimated.`,
 					type: 'info'
 				} satisfies Notification,
 				...s.notifications
@@ -190,13 +262,23 @@
 
 <header class="bg-navy/95 border-navy-600 sticky top-0 z-30 border-b px-4 py-3 backdrop-blur">
 	<div class="flex items-center gap-3">
-		<a href="/" class="text-gray-400 hover:text-white">←</a>
-		<h1 class="font-semibold text-white">New Project</h1>
+		<a href={isMajorRelease && parentProject ? `/projects/${parentProject.id}` : '/'} class="text-gray-400 hover:text-white">←</a>
+		<h1 class="font-semibold text-white">{isMajorRelease ? 'Plan Major Release' : 'New Project'}</h1>
 	</div>
 </header>
 
 <div class="mx-auto max-w-lg space-y-6 px-4 py-6">
 
+	{#if isMajorRelease && parentProject}
+		<div class="rounded-xl border border-purple-700 bg-purple-950 p-4">
+			<div class="mb-1 text-sm font-semibold text-purple-300">
+				📦 Major Release — from "{parentProject.name}" v{parentProject.version}
+			</div>
+			<div class="text-xs text-purple-400">
+				Previously completed features cost half WU. Unfixed bugs are included as fix items.
+			</div>
+		</div>
+	{/if}
 	{#if hasActiveProject}
 		<div class="rounded-xl border border-yellow-700 bg-yellow-950 p-4 text-sm text-yellow-300">
 			⚠️ You already have a project in development. Complete or cancel it before starting a new one.
@@ -205,6 +287,11 @@
 	{#if hasPatchJob}
 		<div class="rounded-xl border border-yellow-700 bg-yellow-950 p-4 text-sm text-yellow-300">
 			⚠️ A patch is in progress. Wait for it to complete before starting a new project.
+		</div>
+	{/if}
+	{#if isMajorRelease && hasMajorReleaseInDev}
+		<div class="rounded-xl border border-yellow-700 bg-yellow-950 p-4 text-sm text-yellow-300">
+			⚠️ A major release is already in development. Only one at a time.
 		</div>
 	{/if}
 
@@ -224,52 +311,60 @@
 
 	<!-- Type -->
 	<div>
-		<div class="mb-2 flex items-center justify-between">
-			<span class="text-sm font-medium text-gray-300">Project Type</span>
-			<div class="bg-navy-700 border-navy-600 flex rounded-lg border p-0.5">
-				<button
-					onclick={() => (showAllTypes = false)}
-					class="rounded px-3 py-1 text-xs font-medium transition-colors"
-					class:bg-neon={!showAllTypes}
-					class:text-navy={!showAllTypes}
-					class:text-gray-400={showAllTypes}
-				>Available</button>
-				<button
-					onclick={() => (showAllTypes = true)}
-					class="rounded px-3 py-1 text-xs font-medium transition-colors"
-					class:bg-neon={showAllTypes}
-					class:text-navy={showAllTypes}
-					class:text-gray-400={!showAllTypes}
-				>All</button>
+		{#if isMajorRelease}
+			<div class="mb-2 text-sm font-medium text-gray-300">Project Type</div>
+			<div class="bg-navy-700 border-navy-600 rounded-xl border px-4 py-3 text-sm text-gray-400">
+				{PROJECT_TYPES[type]?.label ?? type}
+				<span class="ml-2 text-xs text-gray-600">(locked — same as original)</span>
 			</div>
-		</div>
-		<div class="space-y-2">
-			{#each allTypes.filter(e => showAllTypes || e.available) as entry (entry.type)}
-				{@const typeInfo = PROJECT_TYPES[entry.type]}
-				{@const isSelected = type === entry.type}
-				{@const locked = !entry.available}
-				<button
-					onclick={() => entry.available && (type = entry.type)}
-					disabled={locked}
-					class="w-full rounded-xl border px-4 py-3 text-left text-sm transition-all {isSelected && !locked ? 'border-neon bg-neon/10' : (!isSelected ? 'border-navy-600 bg-navy-700' : 'border-navy-600')} {!locked ? 'text-white' : 'opacity-50 cursor-not-allowed'}"
-				>
-					<div class="flex items-center justify-between">
-						<span class:text-neon={isSelected && !locked} class:font-semibold={isSelected && !locked}>
-							{typeInfo.label}
-						</span>
-						{#if !entry.hardwareMet}
-							<span class="rounded bg-orange-900 px-2 py-0.5 text-xs text-orange-300">
-								Requires: {laptopTierLabel(typeInfo.laptopTierMin)}
+		{:else}
+			<div class="mb-2 flex items-center justify-between">
+				<span class="text-sm font-medium text-gray-300">Project Type</span>
+				<div class="bg-navy-700 border-navy-600 flex rounded-lg border p-0.5">
+					<button
+						onclick={() => (showAllTypes = false)}
+						class="rounded px-3 py-1 text-xs font-medium transition-colors"
+						class:bg-neon={!showAllTypes}
+						class:text-navy={!showAllTypes}
+						class:text-gray-400={showAllTypes}
+					>Available</button>
+					<button
+						onclick={() => (showAllTypes = true)}
+						class="rounded px-3 py-1 text-xs font-medium transition-colors"
+						class:bg-neon={showAllTypes}
+						class:text-navy={showAllTypes}
+						class:text-gray-400={!showAllTypes}
+					>All</button>
+				</div>
+			</div>
+			<div class="space-y-2">
+				{#each allTypes.filter(e => showAllTypes || e.available) as entry (entry.type)}
+					{@const typeInfo = PROJECT_TYPES[entry.type]}
+					{@const isSelected = type === entry.type}
+					{@const locked = !entry.available}
+					<button
+						onclick={() => entry.available && (type = entry.type)}
+						disabled={locked}
+						class="w-full rounded-xl border px-4 py-3 text-left text-sm transition-all {isSelected && !locked ? 'border-neon bg-neon/10' : (!isSelected ? 'border-navy-600 bg-navy-700' : 'border-navy-600')} {!locked ? 'text-white' : 'opacity-50 cursor-not-allowed'}"
+					>
+						<div class="flex items-center justify-between">
+							<span class:text-neon={isSelected && !locked} class:font-semibold={isSelected && !locked}>
+								{typeInfo.label}
 							</span>
-						{:else if !entry.researchMet}
-							<span class="rounded bg-navy-600 px-2 py-0.5 text-xs text-gray-500">
-								🔒 Research required
-							</span>
-						{/if}
-					</div>
-				</button>
-			{/each}
-		</div>
+							{#if !entry.hardwareMet}
+								<span class="rounded bg-orange-900 px-2 py-0.5 text-xs text-orange-300">
+									Requires: {laptopTierLabel(typeInfo.laptopTierMin)}
+								</span>
+							{:else if !entry.researchMet}
+								<span class="rounded bg-navy-600 px-2 py-0.5 text-xs text-gray-500">
+									🔒 Research required
+								</span>
+							{/if}
+						</div>
+					</button>
+				{/each}
+			</div>
+		{/if}
 	</div>
 
 	<!-- Category -->
@@ -351,12 +446,52 @@
 				Features
 				<span class="ml-1 font-normal text-gray-500">(select at least 1)</span>
 			</div>
-			<FeatureCheckList
-				features={features()}
-				selected={selectedFeatureIds}
-				{completedResearch}
-				onToggle={toggleFeature}
-			/>
+			{#if isMajorRelease && parentProject}
+				{@const completedParentIds = new Set(parentProject.features.filter(f => f.status === 'complete').map(f => f.id))}
+				<div class="space-y-2">
+					{#each features as feat (feat.id)}
+						{@const isCarriedOver = completedParentIds.has(feat.id)}
+						{@const isBugFix = feat.id.startsWith('bugfix_')}
+						{@const checked = selectedFeatureIds.includes(feat.id)}
+						<label class="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-all
+							{checked ? 'border-neon bg-neon/5' : 'border-navy-600 bg-navy-700'}">
+							<input
+								type="checkbox"
+								class="border-navy-500 bg-navy-600 checked:bg-neon checked:border-neon mt-0.5 shrink-0 rounded"
+								checked={checked}
+								onchange={() => toggleFeature(feat.id)}
+							/>
+							<div class="min-w-0 flex-1">
+								<div class="flex flex-wrap items-center gap-2">
+									<span class="text-sm font-medium text-white">{feat.name}</span>
+									{#if isCarriedOver}
+										<span class="rounded bg-green-900 px-1.5 py-0.5 text-xs text-green-300">✅ Carried over · ½ WU</span>
+									{:else if isBugFix}
+										<span class="rounded bg-red-900 px-1.5 py-0.5 text-xs text-red-300">🐛 Bug Fix</span>
+									{/if}
+								</div>
+								<div class="mt-0.5 flex gap-3 text-xs text-gray-400">
+									<span class="font-mono">{feat.wuCost} WU</span>
+									{#if feat.revenueBoost > 0}
+										<span class="text-green-400">+${feat.revenueBoost}/wk</span>
+									{/if}
+									<span class="text-blue-400">+{feat.qualityBoost} Q</span>
+								</div>
+								{#if feat.description}
+									<div class="mt-0.5 text-xs text-gray-500">{feat.description}</div>
+								{/if}
+							</div>
+						</label>
+					{/each}
+				</div>
+			{:else}
+				<FeatureCheckList
+					features={features}
+					selected={selectedFeatureIds}
+					{completedResearch}
+					onToggle={toggleFeature}
+				/>
+			{/if}
 		</div>
 	{:else}
 		<div class="rounded-xl border border-dashed border-gray-600 bg-navy-700/50 p-4 text-center text-sm text-gray-500">
@@ -399,7 +534,7 @@
 		class:text-gray-500={!canStart}
 		class:cursor-not-allowed={!canStart}
 	>
-		Start Project
+		{isMajorRelease ? `Plan Major Release v${nextMajorVersion}` : 'Start Project'}
 	</button>
 
 </div>

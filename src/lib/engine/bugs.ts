@@ -38,17 +38,19 @@ function pick<T>(arr: T[]): T {
 	return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export function generateBug(project: Project, week: number): Bug {
+export function generateBug(project: Project, week: number, forcedSeverity?: Bug['severity']): Bug {
 	const roll = Math.random();
 	let severity: Bug['severity'];
 	let revenueImpact: number;
 	let description: string;
 
-	if (roll < 0.6) {
+	const sev = forcedSeverity ?? (roll < 0.6 ? 'minor' : roll < 0.9 ? 'major' : 'critical');
+
+	if (sev === 'minor') {
 		severity = 'minor';
 		revenueImpact = Math.round(5 + Math.random() * 15);
 		description = pick(MINOR_DESCRIPTIONS);
-	} else if (roll < 0.9) {
+	} else if (sev === 'major') {
 		severity = 'major';
 		revenueImpact = Math.round(50 + Math.random() * 100);
 		description = pick(MAJOR_DESCRIPTIONS);

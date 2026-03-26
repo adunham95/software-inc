@@ -1,4 +1,5 @@
 import type { GameState, Notification } from '$lib/types';
+import { generateBug } from './bugs';
 
 function makeNotif(
 	week: number,
@@ -107,7 +108,42 @@ export function maybeFireEvent(state: GameState): GameState {
 			projects: state.projects,
 			notif: makeNotif(week, '🌟 Press Coverage! Reputation +5.', 'info'),
 			repDelta: 5
-		})
+		}),
+		// Bug Spike
+		() => {
+			if (!shippedProjects.length) return null;
+			const target = shippedProjects[Math.floor(Math.random() * shippedProjects.length)];
+			const numBugs = 2 + Math.floor(Math.random() * 3); // 2–4
+			const newBugs = Array.from({ length: numBugs }, () => generateBug(target, week, 'minor'));
+			return {
+				projects: state.projects.map((p) =>
+					p.id === target.id ? { ...p, bugs: [...p.bugs, ...newBugs] } : p
+				),
+				notif: makeNotif(
+					week,
+					`🐛 Bug Spike! ${numBugs} minor bugs reported in "${target.name}".`,
+					'warning'
+				)
+			};
+		},
+		// Outage Event
+		() => {
+			if (!shippedProjects.length) return null;
+			const target = shippedProjects[Math.floor(Math.random() * shippedProjects.length)];
+			const criticalBug = generateBug(target, week, 'critical');
+			return {
+				projects: state.projects.map((p) =>
+					p.id === target.id
+						? { ...p, bugs: [...p.bugs, criticalBug], weeklyRevenue: 0 }
+						: p
+				),
+				notif: makeNotif(
+					week,
+					`💥 Outage! "${target.name}" went offline — critical bug detected. No revenue this week.`,
+					'danger'
+				)
+			};
+		}
 	];
 
 	const roll = events[Math.floor(Math.random() * events.length)];

@@ -97,7 +97,7 @@ export function advanceWeek(state: GameState): GameState {
 			const externalCost = HOSTING_EXTERNAL_COST[updated.type] ?? 0;
 			const wuDrain = HOSTING_WU_DRAIN[updated.type] ?? 0;
 
-			const shipped = {
+			let shipped = {
 				...updated,
 				status: 'shipped' as const,
 				weekShipped: week,
@@ -110,6 +110,47 @@ export function advanceWeek(state: GameState): GameState {
 				hostingCostPerWeek: needsHosting ? externalCost : 0,
 				hostingWuDrainPerWeek: needsHosting ? wuDrain : 0
 			};
+
+			// Major release: archive parent, carry over unfixed bugs, apply launch boost
+			if (shipped.isMajorRelease && shipped.parentProjectId) {
+				const parent = s.projects.find((p) => p.id === shipped.parentProjectId);
+				if (parent) {
+					// Archive the parent project
+					s.projects = s.projects.map((p) =>
+						p.id === parent.id
+							? { ...p, status: 'archived' as const, archivedWeek: week }
+							: p
+					);
+					// Reputation +5 for shipping a major release
+					s.meta = { ...s.meta, reputation: Math.min(100, s.meta.reputation + 5) };
+					// Bugs from parent that weren't addressed by bugfix features carry over
+					const addressedBugIds = new Set(
+						shipped.features
+							.filter((f) => f.id.startsWith('bugfix_'))
+							.map((f) => f.id.slice('bugfix_'.length))
+					);
+					const carryOverBugs = parent.bugs.filter(
+						(b) => !b.fixed && !addressedBugIds.has(b.id)
+					);
+					// Launch boost: brand recognition from previous product
+					const launchBoostFactor = 1 + (s.meta.reputation / 100) * 0.3;
+					shipped = {
+						...shipped,
+						bugs: [...shipped.bugs, ...carryOverBugs],
+						weeklyRevenue: Math.round(shipped.weeklyRevenue * launchBoostFactor),
+						activeSubscribers: Math.round(shipped.activeSubscribers * launchBoostFactor)
+					};
+					s.notifications = [
+						makeNotif(
+							week,
+							`🎉 Major Release! "${shipped.name}" launched — Reputation +5. Previous version archived.`,
+							'success'
+						),
+						...s.notifications
+					].slice(0, 50);
+				}
+			}
+
 			s.projects = s.projects.map((p) => (p.id === shipped.id ? shipped : p));
 
 			// Trigger hosting choice modal for products that need hosting

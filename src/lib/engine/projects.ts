@@ -101,8 +101,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Contact Form',
 			description: 'Let visitors get in touch directly.',
 			wuCost: 3,
-			revenueBoost: 2,
-			qualityBoost: 4,
+			revenueBoost: 0,
+			qualityBoost: 8,
 			unlockRequires: []
 		},
 		{
@@ -110,8 +110,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Image Gallery',
 			description: 'Showcase images in a polished gallery.',
 			wuCost: 3,
-			revenueBoost: 3,
-			qualityBoost: 5,
+			revenueBoost: 0,
+			qualityBoost: 10,
 			unlockRequires: []
 		},
 		{
@@ -119,8 +119,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'SEO Optimisation',
 			description: 'Rank higher in search engines.',
 			wuCost: 5,
-			revenueBoost: 8,
-			qualityBoost: 6,
+			revenueBoost: 0,
+			qualityBoost: 12,
 			unlockRequires: ['web_basics']
 		},
 		{
@@ -128,8 +128,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Email Newsletter',
 			description: 'Grow a subscriber list with email updates.',
 			wuCost: 6,
-			revenueBoost: 10,
-			qualityBoost: 6,
+			revenueBoost: 0,
+			qualityBoost: 12,
 			unlockRequires: []
 		},
 		{
@@ -137,8 +137,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Dark Mode',
 			description: 'A sleek dark theme option.',
 			wuCost: 3,
-			revenueBoost: 3,
-			qualityBoost: 4,
+			revenueBoost: 0,
+			qualityBoost: 8,
 			unlockRequires: ['ui_ux']
 		},
 		{
@@ -146,8 +146,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Search',
 			description: 'Full-text search across all content.',
 			wuCost: 5,
-			revenueBoost: 5,
-			qualityBoost: 5,
+			revenueBoost: 0,
+			qualityBoost: 10,
 			unlockRequires: ['web_basics']
 		},
 		{
@@ -155,8 +155,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Social Share Buttons',
 			description: 'Let visitors share your content easily.',
 			wuCost: 2,
-			revenueBoost: 2,
-			qualityBoost: 3,
+			revenueBoost: 0,
+			qualityBoost: 6,
 			unlockRequires: []
 		}
 	],
@@ -166,8 +166,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Popup UI',
 			description: 'A polished popup interface.',
 			wuCost: 5,
-			revenueBoost: 50,
-			qualityBoost: 5,
+			revenueBoost: 0,
+			qualityBoost: 10,
 			unlockRequires: []
 		},
 		{
@@ -175,8 +175,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Context Menu',
 			description: 'Right-click context menu integration.',
 			wuCost: 4,
-			revenueBoost: 30,
-			qualityBoost: 4,
+			revenueBoost: 0,
+			qualityBoost: 8,
 			unlockRequires: []
 		},
 		{
@@ -184,8 +184,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Dark Mode',
 			description: 'A sleek dark theme for your extension.',
 			wuCost: 3,
-			revenueBoost: 40,
-			qualityBoost: 6,
+			revenueBoost: 0,
+			qualityBoost: 12,
 			unlockRequires: ['ui_ux']
 		},
 		{
@@ -193,8 +193,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Sync Across Devices',
 			description: 'Sync settings and data across all devices.',
 			wuCost: 8,
-			revenueBoost: 100,
-			qualityBoost: 8,
+			revenueBoost: 0,
+			qualityBoost: 16,
 			unlockRequires: ['cloud_hosting']
 		},
 		{
@@ -202,8 +202,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Custom Shortcuts',
 			description: 'User-configurable keyboard shortcuts.',
 			wuCost: 4,
-			revenueBoost: 50,
-			qualityBoost: 5,
+			revenueBoost: 0,
+			qualityBoost: 10,
 			unlockRequires: []
 		},
 		{
@@ -211,8 +211,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Analytics Dashboard',
 			description: 'Usage analytics and insights.',
 			wuCost: 7,
-			revenueBoost: 120,
-			qualityBoost: 7,
+			revenueBoost: 0,
+			qualityBoost: 14,
 			unlockRequires: ['web_basics']
 		}
 	],
@@ -222,8 +222,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Push Notifications',
 			description: 'Real-time push notifications.',
 			wuCost: 6,
-			revenueBoost: 200,
-			qualityBoost: 6,
+			revenueBoost: 0,
+			qualityBoost: 12,
 			unlockRequires: []
 		},
 		{
@@ -231,8 +231,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'User Auth',
 			description: 'Secure login and account management.',
 			wuCost: 8,
-			revenueBoost: 150,
-			qualityBoost: 8,
+			revenueBoost: 0,
+			qualityBoost: 16,
 			unlockRequires: ['security']
 		},
 		{
@@ -240,8 +240,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'In-App Chat',
 			description: 'Real-time messaging between users.',
 			wuCost: 12,
-			revenueBoost: 300,
-			qualityBoost: 10,
+			revenueBoost: 0,
+			qualityBoost: 20,
 			unlockRequires: ['mobile_dev']
 		},
 		{
@@ -249,8 +249,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Offline Mode',
 			description: 'Full functionality without internet.',
 			wuCost: 10,
-			revenueBoost: 250,
-			qualityBoost: 9,
+			revenueBoost: 0,
+			qualityBoost: 18,
 			unlockRequires: []
 		},
 		{
@@ -258,8 +258,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Dark Mode',
 			description: 'Dark theme support.',
 			wuCost: 4,
-			revenueBoost: 100,
-			qualityBoost: 5,
+			revenueBoost: 0,
+			qualityBoost: 10,
 			unlockRequires: ['ui_ux']
 		},
 		{
@@ -267,8 +267,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Social Sharing',
 			description: 'Share content to social platforms.',
 			wuCost: 5,
-			revenueBoost: 150,
-			qualityBoost: 6,
+			revenueBoost: 0,
+			qualityBoost: 12,
 			unlockRequires: []
 		},
 		{
@@ -276,8 +276,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Analytics',
 			description: 'User behavior tracking and insights.',
 			wuCost: 7,
-			revenueBoost: 180,
-			qualityBoost: 7,
+			revenueBoost: 0,
+			qualityBoost: 14,
 			unlockRequires: ['web_basics']
 		},
 		{
@@ -285,8 +285,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'In-App Purchases',
 			description: 'Monetize with in-app purchases.',
 			wuCost: 10,
-			revenueBoost: 400,
-			qualityBoost: 8,
+			revenueBoost: 0,
+			qualityBoost: 16,
 			unlockRequires: ['monetization']
 		}
 	],
@@ -296,8 +296,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'User Auth & Teams',
 			description: 'Multi-user authentication with team support.',
 			wuCost: 10,
-			revenueBoost: 400,
-			qualityBoost: 8,
+			revenueBoost: 0,
+			qualityBoost: 16,
 			unlockRequires: ['security']
 		},
 		{
@@ -305,8 +305,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'REST API',
 			description: 'Public API for integrations.',
 			wuCost: 12,
-			revenueBoost: 600,
-			qualityBoost: 10,
+			revenueBoost: 0,
+			qualityBoost: 20,
 			unlockRequires: ['web_basics']
 		},
 		{
@@ -314,8 +314,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Webhooks',
 			description: 'Real-time event notifications via webhooks.',
 			wuCost: 8,
-			revenueBoost: 350,
-			qualityBoost: 7,
+			revenueBoost: 0,
+			qualityBoost: 14,
 			unlockRequires: ['web_basics']
 		},
 		{
@@ -323,8 +323,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Admin Dashboard',
 			description: 'Powerful admin control panel.',
 			wuCost: 10,
-			revenueBoost: 500,
-			qualityBoost: 9,
+			revenueBoost: 0,
+			qualityBoost: 18,
 			unlockRequires: ['ui_ux']
 		},
 		{
@@ -332,8 +332,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'CSV Export',
 			description: 'Export data as CSV files.',
 			wuCost: 5,
-			revenueBoost: 200,
-			qualityBoost: 5,
+			revenueBoost: 0,
+			qualityBoost: 10,
 			unlockRequires: []
 		},
 		{
@@ -341,8 +341,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Email Notifications',
 			description: 'Automated email alerts.',
 			wuCost: 6,
-			revenueBoost: 250,
-			qualityBoost: 6,
+			revenueBoost: 0,
+			qualityBoost: 12,
 			unlockRequires: []
 		},
 		{
@@ -350,8 +350,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Custom Branding',
 			description: 'White-label branding options.',
 			wuCost: 7,
-			revenueBoost: 300,
-			qualityBoost: 7,
+			revenueBoost: 0,
+			qualityBoost: 14,
 			unlockRequires: ['ui_ux']
 		},
 		{
@@ -359,8 +359,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'AI Automation',
 			description: 'AI-powered workflow automation.',
 			wuCost: 15,
-			revenueBoost: 1200,
-			qualityBoost: 12,
+			revenueBoost: 0,
+			qualityBoost: 24,
 			unlockRequires: ['ai_features']
 		}
 	],
@@ -370,8 +370,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Auto-Updater',
 			description: 'Seamless background updates.',
 			wuCost: 6,
-			revenueBoost: 200,
-			qualityBoost: 7,
+			revenueBoost: 0,
+			qualityBoost: 14,
 			unlockRequires: ['devops']
 		},
 		{
@@ -379,8 +379,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Offline Mode',
 			description: 'Full functionality without internet.',
 			wuCost: 8,
-			revenueBoost: 300,
-			qualityBoost: 8,
+			revenueBoost: 0,
+			qualityBoost: 16,
 			unlockRequires: []
 		},
 		{
@@ -388,8 +388,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Plugin System',
 			description: 'Extensible plugin architecture.',
 			wuCost: 14,
-			revenueBoost: 500,
-			qualityBoost: 10,
+			revenueBoost: 0,
+			qualityBoost: 20,
 			unlockRequires: ['web_basics']
 		},
 		{
@@ -397,8 +397,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Cloud Sync',
 			description: 'Sync data across devices via cloud.',
 			wuCost: 10,
-			revenueBoost: 400,
-			qualityBoost: 9,
+			revenueBoost: 0,
+			qualityBoost: 18,
 			unlockRequires: ['cloud_hosting']
 		},
 		{
@@ -406,8 +406,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Dark Mode',
 			description: 'Beautiful dark theme.',
 			wuCost: 4,
-			revenueBoost: 150,
-			qualityBoost: 5,
+			revenueBoost: 0,
+			qualityBoost: 10,
 			unlockRequires: ['ui_ux']
 		},
 		{
@@ -415,8 +415,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Keyboard Shortcuts',
 			description: 'Power-user keyboard navigation.',
 			wuCost: 5,
-			revenueBoost: 180,
-			qualityBoost: 6,
+			revenueBoost: 0,
+			qualityBoost: 12,
 			unlockRequires: []
 		},
 		{
@@ -424,8 +424,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Multi-Language',
 			description: 'Internationalization support.',
 			wuCost: 8,
-			revenueBoost: 350,
-			qualityBoost: 7,
+			revenueBoost: 0,
+			qualityBoost: 14,
 			unlockRequires: []
 		}
 	],
@@ -435,8 +435,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Chat Interface',
 			description: 'Conversational AI chat interface.',
 			wuCost: 10,
-			revenueBoost: 800,
-			qualityBoost: 10,
+			revenueBoost: 0,
+			qualityBoost: 20,
 			unlockRequires: ['ai_features']
 		},
 		{
@@ -444,8 +444,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'API Access',
 			description: 'Programmatic API access.',
 			wuCost: 12,
-			revenueBoost: 1000,
-			qualityBoost: 10,
+			revenueBoost: 0,
+			qualityBoost: 20,
 			unlockRequires: ['ai_features']
 		},
 		{
@@ -453,8 +453,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Custom Model Tuning',
 			description: 'Fine-tune models on customer data.',
 			wuCost: 20,
-			revenueBoost: 2000,
-			qualityBoost: 15,
+			revenueBoost: 0,
+			qualityBoost: 30,
 			unlockRequires: ['ai_features']
 		},
 		{
@@ -462,8 +462,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Data Export',
 			description: 'Export data and model outputs.',
 			wuCost: 6,
-			revenueBoost: 400,
-			qualityBoost: 6,
+			revenueBoost: 0,
+			qualityBoost: 12,
 			unlockRequires: []
 		},
 		{
@@ -471,8 +471,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Team Collaboration',
 			description: 'Multi-user workspaces.',
 			wuCost: 10,
-			revenueBoost: 600,
-			qualityBoost: 8,
+			revenueBoost: 0,
+			qualityBoost: 16,
 			unlockRequires: ['security']
 		},
 		{
@@ -480,8 +480,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Usage Analytics',
 			description: 'Detailed usage metrics and reports.',
 			wuCost: 8,
-			revenueBoost: 500,
-			qualityBoost: 7,
+			revenueBoost: 0,
+			qualityBoost: 14,
 			unlockRequires: ['web_basics']
 		},
 		{
@@ -489,8 +489,8 @@ export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
 			name: 'Webhook Integration',
 			description: 'Trigger external workflows via webhooks.',
 			wuCost: 8,
-			revenueBoost: 700,
-			qualityBoost: 8,
+			revenueBoost: 0,
+			qualityBoost: 16,
 			unlockRequires: ['web_basics']
 		}
 	]
@@ -503,7 +503,7 @@ export const ADVERTISING_FEATURE: FeatureTemplate = {
 	description: 'Run ads on your product. Generates passive ad revenue based on traffic/users.',
 	wuCost: 4,
 	revenueBoost: 0,
-	qualityBoost: -5,
+	qualityBoost: -10,
 	unlockRequires: []
 };
 
@@ -561,213 +561,213 @@ export const CATEGORY_LABELS: Partial<Record<ProjectCategory, string>> = {
 export const CATEGORY_FEATURE_POOLS: Record<ProjectType, Partial<Record<ProjectCategory, FeatureTemplate[]>>> = {
 	basic_website: {
 		blog: [
-			{ id: 'cat_bw_blog_editor', name: 'Post Editor', description: 'Rich-text editor for publishing posts.', wuCost: 6, revenueBoost: 5, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_bw_blog_comments', name: 'Comment System', description: 'Readers can comment on posts.', wuCost: 5, revenueBoost: 4, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_bw_blog_rss', name: 'RSS Feed', description: 'Syndicate content via RSS.', wuCost: 3, revenueBoost: 2, qualityBoost: 4, unlockRequires: ['web_basics'] },
-			{ id: 'cat_bw_blog_authors', name: 'Author Profiles', description: 'Dedicated pages for each author.', wuCost: 4, revenueBoost: 3, qualityBoost: 5, unlockRequires: [] },
-			{ id: 'cat_bw_blog_tags', name: 'Tag & Category System', description: 'Organise posts by tags and categories.', wuCost: 4, revenueBoost: 3, qualityBoost: 5, unlockRequires: [] }
+			{ id: 'cat_bw_blog_editor', name: 'Post Editor', description: 'Rich-text editor for publishing posts.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_bw_blog_comments', name: 'Comment System', description: 'Readers can comment on posts.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_bw_blog_rss', name: 'RSS Feed', description: 'Syndicate content via RSS.', wuCost: 3, revenueBoost: 0, qualityBoost: 8, unlockRequires: ['web_basics'] },
+			{ id: 'cat_bw_blog_authors', name: 'Author Profiles', description: 'Dedicated pages for each author.', wuCost: 4, revenueBoost: 0, qualityBoost: 10, unlockRequires: [] },
+			{ id: 'cat_bw_blog_tags', name: 'Tag & Category System', description: 'Organise posts by tags and categories.', wuCost: 4, revenueBoost: 0, qualityBoost: 10, unlockRequires: [] }
 		],
 		news: [
-			{ id: 'cat_bw_news_banner', name: 'Breaking News Banner', description: 'Prominent breaking news alert strip.', wuCost: 4, revenueBoost: 6, qualityBoost: 5, unlockRequires: [] },
-			{ id: 'cat_bw_news_paywall', name: 'Article Paywall', description: 'Monetise premium content behind a paywall.', wuCost: 8, revenueBoost: 20, qualityBoost: 7, unlockRequires: ['monetization'] },
-			{ id: 'cat_bw_news_push', name: 'Push Alerts', description: 'Notify subscribers of breaking stories.', wuCost: 6, revenueBoost: 10, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_bw_news_live', name: 'Live Blog', description: 'Real-time rolling coverage of events.', wuCost: 7, revenueBoost: 12, qualityBoost: 8, unlockRequires: ['web_basics'] },
-			{ id: 'cat_bw_news_comments', name: 'Comment Section', description: 'Reader discussion below articles.', wuCost: 5, revenueBoost: 4, qualityBoost: 5, unlockRequires: [] }
+			{ id: 'cat_bw_news_banner', name: 'Breaking News Banner', description: 'Prominent breaking news alert strip.', wuCost: 4, revenueBoost: 0, qualityBoost: 10, unlockRequires: [] },
+			{ id: 'cat_bw_news_paywall', name: 'Article Paywall', description: 'Monetise premium content behind a paywall.', wuCost: 8, revenueBoost: 0, qualityBoost: 14, unlockRequires: ['monetization'] },
+			{ id: 'cat_bw_news_push', name: 'Push Alerts', description: 'Notify subscribers of breaking stories.', wuCost: 6, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_bw_news_live', name: 'Live Blog', description: 'Real-time rolling coverage of events.', wuCost: 7, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['web_basics'] },
+			{ id: 'cat_bw_news_comments', name: 'Comment Section', description: 'Reader discussion below articles.', wuCost: 5, revenueBoost: 0, qualityBoost: 10, unlockRequires: [] }
 		],
 		portfolio: [
-			{ id: 'cat_bw_port_showcase', name: 'Project Showcase', description: 'Beautiful grid of your best work.', wuCost: 4, revenueBoost: 3, qualityBoost: 8, unlockRequires: [] },
-			{ id: 'cat_bw_port_testimonials', name: 'Client Testimonials', description: 'Social proof from happy clients.', wuCost: 3, revenueBoost: 2, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_bw_port_cases', name: 'Case Studies', description: 'Deep-dive write-ups of past projects.', wuCost: 5, revenueBoost: 4, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_bw_port_booking', name: 'Booking Form', description: 'Let clients book consultations directly.', wuCost: 5, revenueBoost: 8, qualityBoost: 6, unlockRequires: [] }
+			{ id: 'cat_bw_port_showcase', name: 'Project Showcase', description: 'Beautiful grid of your best work.', wuCost: 4, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] },
+			{ id: 'cat_bw_port_testimonials', name: 'Client Testimonials', description: 'Social proof from happy clients.', wuCost: 3, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_bw_port_cases', name: 'Case Studies', description: 'Deep-dive write-ups of past projects.', wuCost: 5, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_bw_port_booking', name: 'Booking Form', description: 'Let clients book consultations directly.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] }
 		],
 		landing_page: [
-			{ id: 'cat_bw_lp_hero', name: 'Hero Animation', description: 'Eye-catching animated hero section.', wuCost: 5, revenueBoost: 4, qualityBoost: 8, unlockRequires: ['ui_ux'] },
-			{ id: 'cat_bw_lp_ab', name: 'A/B Test Variants', description: 'Test multiple versions to maximise conversions.', wuCost: 8, revenueBoost: 12, qualityBoost: 7, unlockRequires: ['web_basics'] },
-			{ id: 'cat_bw_lp_lead', name: 'Lead Capture Form', description: 'Collect emails from interested visitors.', wuCost: 4, revenueBoost: 8, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_bw_lp_video', name: 'Video Embed', description: 'Embed a product or explainer video.', wuCost: 3, revenueBoost: 4, qualityBoost: 5, unlockRequires: [] },
-			{ id: 'cat_bw_lp_chat', name: 'Live Chat Widget', description: 'Real-time chat for visitor questions.', wuCost: 6, revenueBoost: 6, qualityBoost: 6, unlockRequires: [] }
+			{ id: 'cat_bw_lp_hero', name: 'Hero Animation', description: 'Eye-catching animated hero section.', wuCost: 5, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['ui_ux'] },
+			{ id: 'cat_bw_lp_ab', name: 'A/B Test Variants', description: 'Test multiple versions to maximise conversions.', wuCost: 8, revenueBoost: 0, qualityBoost: 14, unlockRequires: ['web_basics'] },
+			{ id: 'cat_bw_lp_lead', name: 'Lead Capture Form', description: 'Collect emails from interested visitors.', wuCost: 4, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_bw_lp_video', name: 'Video Embed', description: 'Embed a product or explainer video.', wuCost: 3, revenueBoost: 0, qualityBoost: 10, unlockRequires: [] },
+			{ id: 'cat_bw_lp_chat', name: 'Live Chat Widget', description: 'Real-time chat for visitor questions.', wuCost: 6, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] }
 		],
 		community_forum: [
-			{ id: 'cat_bw_forum_threads', name: 'Thread & Reply System', description: 'Core forum post and reply functionality.', wuCost: 8, revenueBoost: 8, qualityBoost: 8, unlockRequires: ['web_basics'] },
-			{ id: 'cat_bw_forum_rep', name: 'User Reputation', description: 'Karma/upvote system for members.', wuCost: 5, revenueBoost: 4, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_bw_forum_mod', name: 'Moderation Tools', description: 'Tools to manage spam and rule violations.', wuCost: 6, revenueBoost: 2, qualityBoost: 6, unlockRequires: ['security'] },
-			{ id: 'cat_bw_forum_pm', name: 'Private Messaging', description: 'Direct messages between members.', wuCost: 7, revenueBoost: 10, qualityBoost: 7, unlockRequires: ['security'] },
-			{ id: 'cat_bw_forum_badges', name: 'Badges & Awards', description: 'Gamified achievement badges for members.', wuCost: 4, revenueBoost: 3, qualityBoost: 5, unlockRequires: [] }
+			{ id: 'cat_bw_forum_threads', name: 'Thread & Reply System', description: 'Core forum post and reply functionality.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['web_basics'] },
+			{ id: 'cat_bw_forum_rep', name: 'User Reputation', description: 'Karma/upvote system for members.', wuCost: 5, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_bw_forum_mod', name: 'Moderation Tools', description: 'Tools to manage spam and rule violations.', wuCost: 6, revenueBoost: 0, qualityBoost: 12, unlockRequires: ['security'] },
+			{ id: 'cat_bw_forum_pm', name: 'Private Messaging', description: 'Direct messages between members.', wuCost: 7, revenueBoost: 0, qualityBoost: 14, unlockRequires: ['security'] },
+			{ id: 'cat_bw_forum_badges', name: 'Badges & Awards', description: 'Gamified achievement badges for members.', wuCost: 4, revenueBoost: 0, qualityBoost: 10, unlockRequires: [] }
 		]
 	},
 	mobile_app: {
 		dating: [
-			{ id: 'cat_ma_dating_swipe', name: 'Swipe Matching', description: 'Swipe-based card matching interface.', wuCost: 10, revenueBoost: 300, qualityBoost: 10, unlockRequires: ['mobile_dev'] },
-			{ id: 'cat_ma_dating_profile', name: 'Profile Builder', description: 'Rich profile with photos and bio.', wuCost: 7, revenueBoost: 150, qualityBoost: 8, unlockRequires: [] },
-			{ id: 'cat_ma_dating_location', name: 'Location-Based Discovery', description: 'Find matches near your location.', wuCost: 9, revenueBoost: 250, qualityBoost: 9, unlockRequires: ['mobile_dev'] },
-			{ id: 'cat_ma_dating_superlikes', name: 'Super Likes', description: 'Premium super-like feature to stand out.', wuCost: 5, revenueBoost: 200, qualityBoost: 6, unlockRequires: ['monetization'] },
-			{ id: 'cat_ma_dating_video', name: 'Video Date', description: 'In-app video calling for virtual dates.', wuCost: 10, revenueBoost: 350, qualityBoost: 10, unlockRequires: ['mobile_dev'] }
+			{ id: 'cat_ma_dating_swipe', name: 'Swipe Matching', description: 'Swipe-based card matching interface.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['mobile_dev'] },
+			{ id: 'cat_ma_dating_profile', name: 'Profile Builder', description: 'Rich profile with photos and bio.', wuCost: 7, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] },
+			{ id: 'cat_ma_dating_location', name: 'Location-Based Discovery', description: 'Find matches near your location.', wuCost: 9, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['mobile_dev'] },
+			{ id: 'cat_ma_dating_superlikes', name: 'Super Likes', description: 'Premium super-like feature to stand out.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: ['monetization'] },
+			{ id: 'cat_ma_dating_video', name: 'Video Date', description: 'In-app video calling for virtual dates.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['mobile_dev'] }
 		],
 		chat: [
-			{ id: 'cat_ma_chat_groups', name: 'Group Chats', description: 'Create and manage group conversations.', wuCost: 8, revenueBoost: 200, qualityBoost: 8, unlockRequires: [] },
-			{ id: 'cat_ma_chat_voice', name: 'Voice Messages', description: 'Record and send voice notes.', wuCost: 7, revenueBoost: 180, qualityBoost: 8, unlockRequires: ['mobile_dev'] },
-			{ id: 'cat_ma_chat_e2e', name: 'End-to-End Encryption', description: 'Private messages that only recipients can read.', wuCost: 10, revenueBoost: 150, qualityBoost: 10, unlockRequires: ['security'] },
-			{ id: 'cat_ma_chat_stickers', name: 'Stickers & Reactions', description: 'Express yourself with stickers and emoji reactions.', wuCost: 5, revenueBoost: 120, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_ma_chat_status', name: 'Status Updates', description: 'Share disappearing status stories.', wuCost: 4, revenueBoost: 100, qualityBoost: 5, unlockRequires: [] }
+			{ id: 'cat_ma_chat_groups', name: 'Group Chats', description: 'Create and manage group conversations.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] },
+			{ id: 'cat_ma_chat_voice', name: 'Voice Messages', description: 'Record and send voice notes.', wuCost: 7, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['mobile_dev'] },
+			{ id: 'cat_ma_chat_e2e', name: 'End-to-End Encryption', description: 'Private messages that only recipients can read.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['security'] },
+			{ id: 'cat_ma_chat_stickers', name: 'Stickers & Reactions', description: 'Express yourself with stickers and emoji reactions.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_ma_chat_status', name: 'Status Updates', description: 'Share disappearing status stories.', wuCost: 4, revenueBoost: 0, qualityBoost: 10, unlockRequires: [] }
 		],
 		entertainment: [
-			{ id: 'cat_ma_ent_feed', name: 'Content Feed', description: 'Scrollable feed of entertainment content.', wuCost: 8, revenueBoost: 250, qualityBoost: 8, unlockRequires: [] },
-			{ id: 'cat_ma_ent_video', name: 'Video Player', description: 'Smooth in-app video playback.', wuCost: 9, revenueBoost: 300, qualityBoost: 9, unlockRequires: ['mobile_dev'] },
-			{ id: 'cat_ma_ent_reco', name: 'Personalised Recommendations', description: 'AI-driven content recommendations.', wuCost: 10, revenueBoost: 400, qualityBoost: 10, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ma_ent_creators', name: 'Creator Profiles', description: 'Dedicated pages for content creators.', wuCost: 6, revenueBoost: 180, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_ma_ent_live', name: 'Live Streaming', description: 'Real-time live broadcast from creators.', wuCost: 12, revenueBoost: 500, qualityBoost: 11, unlockRequires: ['cloud_hosting'] }
+			{ id: 'cat_ma_ent_feed', name: 'Content Feed', description: 'Scrollable feed of entertainment content.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] },
+			{ id: 'cat_ma_ent_video', name: 'Video Player', description: 'Smooth in-app video playback.', wuCost: 9, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['mobile_dev'] },
+			{ id: 'cat_ma_ent_reco', name: 'Personalised Recommendations', description: 'AI-driven content recommendations.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ma_ent_creators', name: 'Creator Profiles', description: 'Dedicated pages for content creators.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_ma_ent_live', name: 'Live Streaming', description: 'Real-time live broadcast from creators.', wuCost: 12, revenueBoost: 0, qualityBoost: 22, unlockRequires: ['cloud_hosting'] }
 		],
 		fitness: [
-			{ id: 'cat_ma_fit_tracker', name: 'Workout Tracker', description: 'Log and track exercise sessions.', wuCost: 7, revenueBoost: 200, qualityBoost: 8, unlockRequires: [] },
-			{ id: 'cat_ma_fit_charts', name: 'Progress Charts', description: 'Visualise fitness progress over time.', wuCost: 6, revenueBoost: 180, qualityBoost: 7, unlockRequires: ['web_basics'] },
-			{ id: 'cat_ma_fit_meal', name: 'Meal Planner', description: 'Plan and track nutrition and meals.', wuCost: 8, revenueBoost: 220, qualityBoost: 8, unlockRequires: [] },
-			{ id: 'cat_ma_fit_wearable', name: 'Wearable Sync', description: 'Sync data from fitness wearables.', wuCost: 9, revenueBoost: 300, qualityBoost: 9, unlockRequires: ['mobile_dev'] },
-			{ id: 'cat_ma_fit_ai', name: 'Coach AI', description: 'AI-powered personal fitness coaching.', wuCost: 12, revenueBoost: 450, qualityBoost: 11, unlockRequires: ['ai_features'] }
+			{ id: 'cat_ma_fit_tracker', name: 'Workout Tracker', description: 'Log and track exercise sessions.', wuCost: 7, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] },
+			{ id: 'cat_ma_fit_charts', name: 'Progress Charts', description: 'Visualise fitness progress over time.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: ['web_basics'] },
+			{ id: 'cat_ma_fit_meal', name: 'Meal Planner', description: 'Plan and track nutrition and meals.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] },
+			{ id: 'cat_ma_fit_wearable', name: 'Wearable Sync', description: 'Sync data from fitness wearables.', wuCost: 9, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['mobile_dev'] },
+			{ id: 'cat_ma_fit_ai', name: 'Coach AI', description: 'AI-powered personal fitness coaching.', wuCost: 12, revenueBoost: 0, qualityBoost: 22, unlockRequires: ['ai_features'] }
 		],
 		education: [
-			{ id: 'cat_ma_edu_player', name: 'Course Player', description: 'Structured video course playback.', wuCost: 8, revenueBoost: 220, qualityBoost: 8, unlockRequires: [] },
-			{ id: 'cat_ma_edu_quiz', name: 'Quiz Engine', description: 'Interactive quizzes and assessments.', wuCost: 6, revenueBoost: 180, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_ma_edu_certs', name: 'Progress Certificates', description: 'Award certificates on course completion.', wuCost: 5, revenueBoost: 150, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_ma_edu_live', name: 'Live Classes', description: 'Real-time live teaching sessions.', wuCost: 10, revenueBoost: 350, qualityBoost: 10, unlockRequires: ['cloud_hosting'] },
-			{ id: 'cat_ma_edu_ai', name: 'AI Tutor', description: 'Personalised AI-driven tutoring.', wuCost: 12, revenueBoost: 500, qualityBoost: 11, unlockRequires: ['ai_features'] }
+			{ id: 'cat_ma_edu_player', name: 'Course Player', description: 'Structured video course playback.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] },
+			{ id: 'cat_ma_edu_quiz', name: 'Quiz Engine', description: 'Interactive quizzes and assessments.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_ma_edu_certs', name: 'Progress Certificates', description: 'Award certificates on course completion.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_ma_edu_live', name: 'Live Classes', description: 'Real-time live teaching sessions.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['cloud_hosting'] },
+			{ id: 'cat_ma_edu_ai', name: 'AI Tutor', description: 'Personalised AI-driven tutoring.', wuCost: 12, revenueBoost: 0, qualityBoost: 22, unlockRequires: ['ai_features'] }
 		]
 	},
 	saas: {
 		productivity: [
-			{ id: 'cat_saas_prod_editor', name: 'Word Editor', description: 'Rich-text document editing.', wuCost: 10, revenueBoost: 400, qualityBoost: 9, unlockRequires: ['web_basics'] },
-			{ id: 'cat_saas_prod_sheets', name: 'Spreadsheet Editor', description: 'Collaborative spreadsheets.', wuCost: 12, revenueBoost: 500, qualityBoost: 10, unlockRequires: ['web_basics'] },
-			{ id: 'cat_saas_prod_kanban', name: 'Task Board (Kanban)', description: 'Visual task management board.', wuCost: 8, revenueBoost: 300, qualityBoost: 8, unlockRequires: [] },
-			{ id: 'cat_saas_prod_cal', name: 'Calendar Integration', description: 'Sync tasks with calendar events.', wuCost: 7, revenueBoost: 250, qualityBoost: 7, unlockRequires: ['web_basics'] },
-			{ id: 'cat_saas_prod_templates', name: 'Templates Library', description: 'Pre-built templates to get started fast.', wuCost: 6, revenueBoost: 200, qualityBoost: 7, unlockRequires: [] }
+			{ id: 'cat_saas_prod_editor', name: 'Word Editor', description: 'Rich-text document editing.', wuCost: 10, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['web_basics'] },
+			{ id: 'cat_saas_prod_sheets', name: 'Spreadsheet Editor', description: 'Collaborative spreadsheets.', wuCost: 12, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['web_basics'] },
+			{ id: 'cat_saas_prod_kanban', name: 'Task Board (Kanban)', description: 'Visual task management board.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] },
+			{ id: 'cat_saas_prod_cal', name: 'Calendar Integration', description: 'Sync tasks with calendar events.', wuCost: 7, revenueBoost: 0, qualityBoost: 14, unlockRequires: ['web_basics'] },
+			{ id: 'cat_saas_prod_templates', name: 'Templates Library', description: 'Pre-built templates to get started fast.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] }
 		],
 		crm: [
-			{ id: 'cat_saas_crm_contacts', name: 'Contact Database', description: 'Centralised customer contact records.', wuCost: 8, revenueBoost: 350, qualityBoost: 8, unlockRequires: [] },
-			{ id: 'cat_saas_crm_pipeline', name: 'Deal Pipeline', description: 'Visual sales pipeline management.', wuCost: 9, revenueBoost: 400, qualityBoost: 9, unlockRequires: [] },
-			{ id: 'cat_saas_crm_email', name: 'Email Sequences', description: 'Automated follow-up email campaigns.', wuCost: 10, revenueBoost: 450, qualityBoost: 9, unlockRequires: ['web_basics'] },
-			{ id: 'cat_saas_crm_timeline', name: 'Activity Timeline', description: 'Full history of customer interactions.', wuCost: 6, revenueBoost: 250, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_saas_crm_forecast', name: 'Sales Forecasting', description: 'AI-driven revenue forecasting.', wuCost: 10, revenueBoost: 500, qualityBoost: 10, unlockRequires: ['ai_features'] }
+			{ id: 'cat_saas_crm_contacts', name: 'Contact Database', description: 'Centralised customer contact records.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] },
+			{ id: 'cat_saas_crm_pipeline', name: 'Deal Pipeline', description: 'Visual sales pipeline management.', wuCost: 9, revenueBoost: 0, qualityBoost: 18, unlockRequires: [] },
+			{ id: 'cat_saas_crm_email', name: 'Email Sequences', description: 'Automated follow-up email campaigns.', wuCost: 10, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['web_basics'] },
+			{ id: 'cat_saas_crm_timeline', name: 'Activity Timeline', description: 'Full history of customer interactions.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_saas_crm_forecast', name: 'Sales Forecasting', description: 'AI-driven revenue forecasting.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['ai_features'] }
 		],
 		analytics: [
-			{ id: 'cat_saas_anl_dashboards', name: 'Custom Dashboards', description: 'Drag-and-drop analytics dashboards.', wuCost: 9, revenueBoost: 400, qualityBoost: 9, unlockRequires: ['ui_ux'] },
-			{ id: 'cat_saas_anl_funnels', name: 'Funnel Reports', description: 'Visualise conversion funnels.', wuCost: 8, revenueBoost: 350, qualityBoost: 8, unlockRequires: ['web_basics'] },
-			{ id: 'cat_saas_anl_export', name: 'Data Export', description: 'Export data as CSV or JSON.', wuCost: 5, revenueBoost: 200, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_saas_anl_anomaly', name: 'Anomaly Detection', description: 'AI flags unusual data patterns.', wuCost: 10, revenueBoost: 500, qualityBoost: 10, unlockRequires: ['ai_features'] },
-			{ id: 'cat_saas_anl_ab', name: 'A/B Test Reports', description: 'Statistical results for A/B experiments.', wuCost: 8, revenueBoost: 350, qualityBoost: 8, unlockRequires: ['web_basics'] }
+			{ id: 'cat_saas_anl_dashboards', name: 'Custom Dashboards', description: 'Drag-and-drop analytics dashboards.', wuCost: 9, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['ui_ux'] },
+			{ id: 'cat_saas_anl_funnels', name: 'Funnel Reports', description: 'Visualise conversion funnels.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['web_basics'] },
+			{ id: 'cat_saas_anl_export', name: 'Data Export', description: 'Export data as CSV or JSON.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_saas_anl_anomaly', name: 'Anomaly Detection', description: 'AI flags unusual data patterns.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['ai_features'] },
+			{ id: 'cat_saas_anl_ab', name: 'A/B Test Reports', description: 'Statistical results for A/B experiments.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['web_basics'] }
 		],
 		devtools: [
-			{ id: 'cat_saas_dev_editor', name: 'Code Editor', description: 'Browser-based code editing environment.', wuCost: 10, revenueBoost: 400, qualityBoost: 9, unlockRequires: ['web_basics'] },
-			{ id: 'cat_saas_dev_cicd', name: 'CI/CD Integration', description: 'Automated build and deployment pipelines.', wuCost: 10, revenueBoost: 450, qualityBoost: 9, unlockRequires: ['devops'] },
-			{ id: 'cat_saas_dev_errors', name: 'Error Monitoring', description: 'Real-time error tracking and alerting.', wuCost: 8, revenueBoost: 350, qualityBoost: 8, unlockRequires: ['web_basics'] },
-			{ id: 'cat_saas_dev_logs', name: 'Log Viewer', description: 'Searchable structured log explorer.', wuCost: 6, revenueBoost: 250, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_saas_dev_ai', name: 'AI Code Review', description: 'Automated AI-powered code review.', wuCost: 12, revenueBoost: 600, qualityBoost: 11, unlockRequires: ['ai_features'] }
+			{ id: 'cat_saas_dev_editor', name: 'Code Editor', description: 'Browser-based code editing environment.', wuCost: 10, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['web_basics'] },
+			{ id: 'cat_saas_dev_cicd', name: 'CI/CD Integration', description: 'Automated build and deployment pipelines.', wuCost: 10, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['devops'] },
+			{ id: 'cat_saas_dev_errors', name: 'Error Monitoring', description: 'Real-time error tracking and alerting.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['web_basics'] },
+			{ id: 'cat_saas_dev_logs', name: 'Log Viewer', description: 'Searchable structured log explorer.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_saas_dev_ai', name: 'AI Code Review', description: 'Automated AI-powered code review.', wuCost: 12, revenueBoost: 0, qualityBoost: 22, unlockRequires: ['ai_features'] }
 		],
 		finance: [
-			{ id: 'cat_saas_fin_invoices', name: 'Invoice Generator', description: 'Create and send professional invoices.', wuCost: 7, revenueBoost: 300, qualityBoost: 8, unlockRequires: [] },
-			{ id: 'cat_saas_fin_expenses', name: 'Expense Tracker', description: 'Track and categorise business expenses.', wuCost: 7, revenueBoost: 280, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_saas_fin_bank', name: 'Bank Sync', description: 'Automatically import bank transactions.', wuCost: 10, revenueBoost: 500, qualityBoost: 10, unlockRequires: ['security'] },
-			{ id: 'cat_saas_fin_tax', name: 'Tax Reports', description: 'Auto-generate tax-ready financial reports.', wuCost: 9, revenueBoost: 450, qualityBoost: 9, unlockRequires: ['web_basics'] },
-			{ id: 'cat_saas_fin_currency', name: 'Multi-Currency', description: 'Handle transactions in multiple currencies.', wuCost: 8, revenueBoost: 350, qualityBoost: 8, unlockRequires: [] }
+			{ id: 'cat_saas_fin_invoices', name: 'Invoice Generator', description: 'Create and send professional invoices.', wuCost: 7, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] },
+			{ id: 'cat_saas_fin_expenses', name: 'Expense Tracker', description: 'Track and categorise business expenses.', wuCost: 7, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_saas_fin_bank', name: 'Bank Sync', description: 'Automatically import bank transactions.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['security'] },
+			{ id: 'cat_saas_fin_tax', name: 'Tax Reports', description: 'Auto-generate tax-ready financial reports.', wuCost: 9, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['web_basics'] },
+			{ id: 'cat_saas_fin_currency', name: 'Multi-Currency', description: 'Handle transactions in multiple currencies.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] }
 		]
 	},
 	desktop_app: {
 		productivity: [
-			{ id: 'cat_da_prod_doc', name: 'Document Editor', description: 'Full-featured desktop document editing.', wuCost: 10, revenueBoost: 350, qualityBoost: 9, unlockRequires: [] },
-			{ id: 'cat_da_prod_sheets', name: 'Spreadsheet Editor', description: 'Powerful desktop spreadsheets.', wuCost: 12, revenueBoost: 400, qualityBoost: 10, unlockRequires: [] },
-			{ id: 'cat_da_prod_pdf', name: 'PDF Viewer', description: 'View and annotate PDF files.', wuCost: 6, revenueBoost: 200, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_da_prod_focus', name: 'Focus Timer', description: 'Pomodoro-style productivity timer.', wuCost: 5, revenueBoost: 150, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_da_prod_cal', name: 'Calendar Sidebar', description: 'Integrated calendar panel.', wuCost: 7, revenueBoost: 250, qualityBoost: 7, unlockRequires: [] }
+			{ id: 'cat_da_prod_doc', name: 'Document Editor', description: 'Full-featured desktop document editing.', wuCost: 10, revenueBoost: 0, qualityBoost: 18, unlockRequires: [] },
+			{ id: 'cat_da_prod_sheets', name: 'Spreadsheet Editor', description: 'Powerful desktop spreadsheets.', wuCost: 12, revenueBoost: 0, qualityBoost: 20, unlockRequires: [] },
+			{ id: 'cat_da_prod_pdf', name: 'PDF Viewer', description: 'View and annotate PDF files.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_da_prod_focus', name: 'Focus Timer', description: 'Pomodoro-style productivity timer.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_da_prod_cal', name: 'Calendar Sidebar', description: 'Integrated calendar panel.', wuCost: 7, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] }
 		],
 		video_game: [
-			{ id: 'cat_da_game_save', name: 'Save System', description: 'Multiple save slots and autosave.', wuCost: 6, revenueBoost: 200, qualityBoost: 8, unlockRequires: [] },
-			{ id: 'cat_da_game_leader', name: 'Leaderboard', description: 'Online leaderboard for top scores.', wuCost: 7, revenueBoost: 250, qualityBoost: 7, unlockRequires: ['cloud_hosting'] },
-			{ id: 'cat_da_game_controller', name: 'Controller Support', description: 'Full gamepad and controller support.', wuCost: 5, revenueBoost: 180, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_da_game_mods', name: 'Mod Support', description: 'Community modding API and workshop.', wuCost: 10, revenueBoost: 400, qualityBoost: 10, unlockRequires: [] },
-			{ id: 'cat_da_game_steam', name: 'Steam Integration', description: 'Steam achievements, DLC, and workshop.', wuCost: 9, revenueBoost: 500, qualityBoost: 9, unlockRequires: ['devops'] }
+			{ id: 'cat_da_game_save', name: 'Save System', description: 'Multiple save slots and autosave.', wuCost: 6, revenueBoost: 0, qualityBoost: 16, unlockRequires: [] },
+			{ id: 'cat_da_game_leader', name: 'Leaderboard', description: 'Online leaderboard for top scores.', wuCost: 7, revenueBoost: 0, qualityBoost: 14, unlockRequires: ['cloud_hosting'] },
+			{ id: 'cat_da_game_controller', name: 'Controller Support', description: 'Full gamepad and controller support.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_da_game_mods', name: 'Mod Support', description: 'Community modding API and workshop.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: [] },
+			{ id: 'cat_da_game_steam', name: 'Steam Integration', description: 'Steam achievements, DLC, and workshop.', wuCost: 9, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['devops'] }
 		],
 		media_player: [
-			{ id: 'cat_da_media_playlist', name: 'Playlist Manager', description: 'Create and manage playlists.', wuCost: 6, revenueBoost: 200, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_da_media_eq', name: 'Equaliser', description: '10-band audio equaliser.', wuCost: 5, revenueBoost: 150, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_da_media_formats', name: 'Format Support (FLAC etc)', description: 'Play lossless and rare audio formats.', wuCost: 6, revenueBoost: 180, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_da_media_cast', name: 'Chromecast / AirPlay', description: 'Cast media to TV and speakers.', wuCost: 8, revenueBoost: 300, qualityBoost: 8, unlockRequires: ['cloud_hosting'] },
-			{ id: 'cat_da_media_viz', name: 'Visualiser', description: 'Audio spectrum visualiser.', wuCost: 4, revenueBoost: 100, qualityBoost: 5, unlockRequires: ['ui_ux'] }
+			{ id: 'cat_da_media_playlist', name: 'Playlist Manager', description: 'Create and manage playlists.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_da_media_eq', name: 'Equaliser', description: '10-band audio equaliser.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_da_media_formats', name: 'Format Support (FLAC etc)', description: 'Play lossless and rare audio formats.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_da_media_cast', name: 'Chromecast / AirPlay', description: 'Cast media to TV and speakers.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['cloud_hosting'] },
+			{ id: 'cat_da_media_viz', name: 'Visualiser', description: 'Audio spectrum visualiser.', wuCost: 4, revenueBoost: 0, qualityBoost: 10, unlockRequires: ['ui_ux'] }
 		],
 		developer_tool: [
-			{ id: 'cat_da_dev_syntax', name: 'Syntax Highlighting', description: 'Colour-coded syntax for 50+ languages.', wuCost: 6, revenueBoost: 200, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_da_dev_git', name: 'Git Integration', description: 'Visual Git history, diff, and commit UI.', wuCost: 8, revenueBoost: 300, qualityBoost: 8, unlockRequires: ['devops'] },
-			{ id: 'cat_da_dev_terminal', name: 'Terminal Emulator', description: 'Built-in terminal inside the app.', wuCost: 7, revenueBoost: 250, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_da_dev_marketplace', name: 'Extension Marketplace', description: 'Install community-built extensions.', wuCost: 10, revenueBoost: 400, qualityBoost: 10, unlockRequires: [] },
-			{ id: 'cat_da_dev_ai', name: 'AI Autocomplete', description: 'AI-powered code completion.', wuCost: 12, revenueBoost: 600, qualityBoost: 11, unlockRequires: ['ai_features'] }
+			{ id: 'cat_da_dev_syntax', name: 'Syntax Highlighting', description: 'Colour-coded syntax for 50+ languages.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_da_dev_git', name: 'Git Integration', description: 'Visual Git history, diff, and commit UI.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['devops'] },
+			{ id: 'cat_da_dev_terminal', name: 'Terminal Emulator', description: 'Built-in terminal inside the app.', wuCost: 7, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_da_dev_marketplace', name: 'Extension Marketplace', description: 'Install community-built extensions.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: [] },
+			{ id: 'cat_da_dev_ai', name: 'AI Autocomplete', description: 'AI-powered code completion.', wuCost: 12, revenueBoost: 0, qualityBoost: 22, unlockRequires: ['ai_features'] }
 		],
 		security: [
-			{ id: 'cat_da_sec_vault', name: 'Password Vault', description: 'Encrypted local password storage.', wuCost: 8, revenueBoost: 300, qualityBoost: 9, unlockRequires: ['security'] },
-			{ id: 'cat_da_sec_2fa', name: '2FA Manager', description: 'TOTP-based two-factor authentication codes.', wuCost: 7, revenueBoost: 250, qualityBoost: 8, unlockRequires: ['security'] },
-			{ id: 'cat_da_sec_vpn', name: 'VPN Integration', description: 'One-click VPN toggle.', wuCost: 10, revenueBoost: 400, qualityBoost: 9, unlockRequires: ['security'] },
-			{ id: 'cat_da_sec_breach', name: 'Breach Alerts', description: 'Notify when your credentials appear in breaches.', wuCost: 6, revenueBoost: 200, qualityBoost: 7, unlockRequires: ['security'] },
-			{ id: 'cat_da_sec_notes', name: 'Secure Notes', description: 'Encrypted note-taking.', wuCost: 5, revenueBoost: 150, qualityBoost: 6, unlockRequires: [] }
+			{ id: 'cat_da_sec_vault', name: 'Password Vault', description: 'Encrypted local password storage.', wuCost: 8, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['security'] },
+			{ id: 'cat_da_sec_2fa', name: '2FA Manager', description: 'TOTP-based two-factor authentication codes.', wuCost: 7, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['security'] },
+			{ id: 'cat_da_sec_vpn', name: 'VPN Integration', description: 'One-click VPN toggle.', wuCost: 10, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['security'] },
+			{ id: 'cat_da_sec_breach', name: 'Breach Alerts', description: 'Notify when your credentials appear in breaches.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: ['security'] },
+			{ id: 'cat_da_sec_notes', name: 'Secure Notes', description: 'Encrypted note-taking.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] }
 		]
 	},
 	browser_ext: {
 		productivity: [
-			{ id: 'cat_be_prod_tabs', name: 'Tab Manager', description: 'Organise and search open tabs.', wuCost: 6, revenueBoost: 60, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_be_prod_focus', name: 'Focus Mode (site blocker)', description: 'Block distracting sites during focus sessions.', wuCost: 5, revenueBoost: 50, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_be_prod_reading', name: 'Reading List', description: 'Save articles to read later.', wuCost: 4, revenueBoost: 40, qualityBoost: 5, unlockRequires: [] },
-			{ id: 'cat_be_prod_clipboard', name: 'Clipboard History', description: 'Access recent clipboard entries.', wuCost: 5, revenueBoost: 55, qualityBoost: 6, unlockRequires: [] }
+			{ id: 'cat_be_prod_tabs', name: 'Tab Manager', description: 'Organise and search open tabs.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_be_prod_focus', name: 'Focus Mode (site blocker)', description: 'Block distracting sites during focus sessions.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_be_prod_reading', name: 'Reading List', description: 'Save articles to read later.', wuCost: 4, revenueBoost: 0, qualityBoost: 10, unlockRequires: [] },
+			{ id: 'cat_be_prod_clipboard', name: 'Clipboard History', description: 'Access recent clipboard entries.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] }
 		],
 		privacy: [
-			{ id: 'cat_be_priv_adblock', name: 'Ad Blocker', description: 'Block ads and tracking scripts.', wuCost: 7, revenueBoost: 80, qualityBoost: 8, unlockRequires: ['security'] },
-			{ id: 'cat_be_priv_tracker', name: 'Tracker Blocker', description: 'Block cross-site trackers.', wuCost: 7, revenueBoost: 70, qualityBoost: 8, unlockRequires: ['security'] },
-			{ id: 'cat_be_priv_cookies', name: 'Cookie Manager', description: 'View and delete cookies per site.', wuCost: 5, revenueBoost: 50, qualityBoost: 6, unlockRequires: ['security'] },
-			{ id: 'cat_be_priv_https', name: 'HTTPS Enforcer', description: 'Upgrade all connections to HTTPS.', wuCost: 4, revenueBoost: 40, qualityBoost: 6, unlockRequires: ['security'] }
+			{ id: 'cat_be_priv_adblock', name: 'Ad Blocker', description: 'Block ads and tracking scripts.', wuCost: 7, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['security'] },
+			{ id: 'cat_be_priv_tracker', name: 'Tracker Blocker', description: 'Block cross-site trackers.', wuCost: 7, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['security'] },
+			{ id: 'cat_be_priv_cookies', name: 'Cookie Manager', description: 'View and delete cookies per site.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: ['security'] },
+			{ id: 'cat_be_priv_https', name: 'HTTPS Enforcer', description: 'Upgrade all connections to HTTPS.', wuCost: 4, revenueBoost: 0, qualityBoost: 12, unlockRequires: ['security'] }
 		],
 		shopping: [
-			{ id: 'cat_be_shop_compare', name: 'Price Comparison', description: 'Compare prices across retailers instantly.', wuCost: 8, revenueBoost: 100, qualityBoost: 8, unlockRequires: ['web_basics'] },
-			{ id: 'cat_be_shop_coupons', name: 'Coupon Finder', description: 'Automatically apply discount codes at checkout.', wuCost: 6, revenueBoost: 80, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_be_shop_history', name: 'Price History Chart', description: 'Show historical price trends for products.', wuCost: 7, revenueBoost: 90, qualityBoost: 7, unlockRequires: ['web_basics'] },
-			{ id: 'cat_be_shop_wishlist', name: 'Wishlist Sync', description: 'Sync wishlists across devices.', wuCost: 5, revenueBoost: 60, qualityBoost: 6, unlockRequires: ['cloud_hosting'] }
+			{ id: 'cat_be_shop_compare', name: 'Price Comparison', description: 'Compare prices across retailers instantly.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['web_basics'] },
+			{ id: 'cat_be_shop_coupons', name: 'Coupon Finder', description: 'Automatically apply discount codes at checkout.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_be_shop_history', name: 'Price History Chart', description: 'Show historical price trends for products.', wuCost: 7, revenueBoost: 0, qualityBoost: 14, unlockRequires: ['web_basics'] },
+			{ id: 'cat_be_shop_wishlist', name: 'Wishlist Sync', description: 'Sync wishlists across devices.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: ['cloud_hosting'] }
 		],
 		developer: [
-			{ id: 'cat_be_dev_json', name: 'JSON Formatter', description: 'Pretty-print and explore JSON responses.', wuCost: 4, revenueBoost: 40, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_be_dev_api', name: 'API Tester', description: 'Send HTTP requests from the browser.', wuCost: 7, revenueBoost: 90, qualityBoost: 8, unlockRequires: ['web_basics'] },
-			{ id: 'cat_be_dev_css', name: 'CSS Inspector', description: 'Live CSS editing and inspection.', wuCost: 5, revenueBoost: 60, qualityBoost: 7, unlockRequires: ['ui_ux'] },
-			{ id: 'cat_be_dev_color', name: 'Colour Picker', description: 'Pick any colour from the current page.', wuCost: 3, revenueBoost: 30, qualityBoost: 5, unlockRequires: [] }
+			{ id: 'cat_be_dev_json', name: 'JSON Formatter', description: 'Pretty-print and explore JSON responses.', wuCost: 4, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_be_dev_api', name: 'API Tester', description: 'Send HTTP requests from the browser.', wuCost: 7, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['web_basics'] },
+			{ id: 'cat_be_dev_css', name: 'CSS Inspector', description: 'Live CSS editing and inspection.', wuCost: 5, revenueBoost: 0, qualityBoost: 14, unlockRequires: ['ui_ux'] },
+			{ id: 'cat_be_dev_color', name: 'Colour Picker', description: 'Pick any colour from the current page.', wuCost: 3, revenueBoost: 0, qualityBoost: 10, unlockRequires: [] }
 		],
 		social: [
-			{ id: 'cat_be_soc_crosspost', name: 'Cross-Post Tool', description: 'Post to multiple social networks at once.', wuCost: 7, revenueBoost: 80, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_be_soc_filter', name: 'Feed Filter', description: 'Filter and clean up social media feeds.', wuCost: 5, revenueBoost: 60, qualityBoost: 6, unlockRequires: [] },
-			{ id: 'cat_be_soc_screenshot', name: 'Screenshot Annotator', description: 'Capture and annotate screenshots.', wuCost: 6, revenueBoost: 70, qualityBoost: 7, unlockRequires: [] },
-			{ id: 'cat_be_soc_preview', name: 'Link Preview', description: 'Show rich previews for shared links.', wuCost: 4, revenueBoost: 40, qualityBoost: 5, unlockRequires: [] }
+			{ id: 'cat_be_soc_crosspost', name: 'Cross-Post Tool', description: 'Post to multiple social networks at once.', wuCost: 7, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_be_soc_filter', name: 'Feed Filter', description: 'Filter and clean up social media feeds.', wuCost: 5, revenueBoost: 0, qualityBoost: 12, unlockRequires: [] },
+			{ id: 'cat_be_soc_screenshot', name: 'Screenshot Annotator', description: 'Capture and annotate screenshots.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
+			{ id: 'cat_be_soc_preview', name: 'Link Preview', description: 'Show rich previews for shared links.', wuCost: 4, revenueBoost: 0, qualityBoost: 10, unlockRequires: [] }
 		]
 	},
 	ai_product: {
 		writing_assistant: [
-			{ id: 'cat_ai_write_grammar', name: 'Grammar & Style Check', description: 'Real-time grammar and style suggestions.', wuCost: 8, revenueBoost: 500, qualityBoost: 8, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_write_tone', name: 'Tone Rewriter', description: 'Rewrite content in different tones.', wuCost: 8, revenueBoost: 500, qualityBoost: 8, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_write_longform', name: 'Long-Form Drafting', description: 'AI drafts full articles and documents.', wuCost: 12, revenueBoost: 800, qualityBoost: 10, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_write_brand', name: 'Brand Voice Training', description: 'Train AI on your brand style guide.', wuCost: 10, revenueBoost: 700, qualityBoost: 9, unlockRequires: ['ai_features'] }
+			{ id: 'cat_ai_write_grammar', name: 'Grammar & Style Check', description: 'Real-time grammar and style suggestions.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_write_tone', name: 'Tone Rewriter', description: 'Rewrite content in different tones.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_write_longform', name: 'Long-Form Drafting', description: 'AI drafts full articles and documents.', wuCost: 12, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_write_brand', name: 'Brand Voice Training', description: 'Train AI on your brand style guide.', wuCost: 10, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['ai_features'] }
 		],
 		code_assistant: [
-			{ id: 'cat_ai_code_autocomplete', name: 'Autocomplete Engine', description: 'Context-aware code completions.', wuCost: 10, revenueBoost: 700, qualityBoost: 10, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_code_explainer', name: 'Bug Explainer', description: 'AI explains what bugs do and why they happen.', wuCost: 8, revenueBoost: 500, qualityBoost: 8, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_code_tests', name: 'Test Generator', description: 'Auto-generate unit tests for your code.', wuCost: 9, revenueBoost: 600, qualityBoost: 9, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_code_review', name: 'Code Review Bot', description: 'Automated PR review and suggestions.', wuCost: 10, revenueBoost: 700, qualityBoost: 9, unlockRequires: ['ai_features'] }
+			{ id: 'cat_ai_code_autocomplete', name: 'Autocomplete Engine', description: 'Context-aware code completions.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_code_explainer', name: 'Bug Explainer', description: 'AI explains what bugs do and why they happen.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_code_tests', name: 'Test Generator', description: 'Auto-generate unit tests for your code.', wuCost: 9, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_code_review', name: 'Code Review Bot', description: 'Automated PR review and suggestions.', wuCost: 10, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['ai_features'] }
 		],
 		image_generation: [
-			{ id: 'cat_ai_img_presets', name: 'Style Presets', description: 'One-click artistic style presets.', wuCost: 7, revenueBoost: 500, qualityBoost: 8, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_img_inpaint', name: 'Inpainting', description: 'Edit specific regions of an image with AI.', wuCost: 10, revenueBoost: 700, qualityBoost: 9, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_img_batch', name: 'Batch Generation', description: 'Generate multiple images from one prompt.', wuCost: 8, revenueBoost: 600, qualityBoost: 8, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_img_license', name: 'Commercial Licence Export', description: 'Export images with commercial usage rights.', wuCost: 6, revenueBoost: 800, qualityBoost: 7, unlockRequires: ['monetization'] }
+			{ id: 'cat_ai_img_presets', name: 'Style Presets', description: 'One-click artistic style presets.', wuCost: 7, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_img_inpaint', name: 'Inpainting', description: 'Edit specific regions of an image with AI.', wuCost: 10, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_img_batch', name: 'Batch Generation', description: 'Generate multiple images from one prompt.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_img_license', name: 'Commercial Licence Export', description: 'Export images with commercial usage rights.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: ['monetization'] }
 		],
 		data_analysis: [
-			{ id: 'cat_ai_data_csv', name: 'CSV Analyser', description: 'Upload and analyse CSV data with AI.', wuCost: 8, revenueBoost: 600, qualityBoost: 8, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_data_charts', name: 'Chart Generator', description: 'Auto-generate charts from your data.', wuCost: 8, revenueBoost: 550, qualityBoost: 8, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_data_anomaly', name: 'Anomaly Detection', description: 'AI flags outliers and unusual patterns.', wuCost: 10, revenueBoost: 700, qualityBoost: 9, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_data_nlq', name: 'Natural Language Queries', description: 'Ask questions about your data in plain English.', wuCost: 10, revenueBoost: 750, qualityBoost: 10, unlockRequires: ['ai_features'] }
+			{ id: 'cat_ai_data_csv', name: 'CSV Analyser', description: 'Upload and analyse CSV data with AI.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_data_charts', name: 'Chart Generator', description: 'Auto-generate charts from your data.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_data_anomaly', name: 'Anomaly Detection', description: 'AI flags outliers and unusual patterns.', wuCost: 10, revenueBoost: 0, qualityBoost: 18, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_data_nlq', name: 'Natural Language Queries', description: 'Ask questions about your data in plain English.', wuCost: 10, revenueBoost: 0, qualityBoost: 20, unlockRequires: ['ai_features'] }
 		],
 		customer_support: [
-			{ id: 'cat_ai_cs_faq', name: 'FAQ Bot', description: 'AI answers common support questions.', wuCost: 7, revenueBoost: 500, qualityBoost: 8, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_cs_triage', name: 'Ticket Triage', description: 'Auto-categorise and route support tickets.', wuCost: 8, revenueBoost: 550, qualityBoost: 8, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_cs_sentiment', name: 'Sentiment Analysis', description: 'Detect customer mood from messages.', wuCost: 8, revenueBoost: 500, qualityBoost: 8, unlockRequires: ['ai_features'] },
-			{ id: 'cat_ai_cs_handoff', name: 'Human Handoff', description: 'Seamlessly escalate to a human agent.', wuCost: 6, revenueBoost: 350, qualityBoost: 7, unlockRequires: [] }
+			{ id: 'cat_ai_cs_faq', name: 'FAQ Bot', description: 'AI answers common support questions.', wuCost: 7, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_cs_triage', name: 'Ticket Triage', description: 'Auto-categorise and route support tickets.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_cs_sentiment', name: 'Sentiment Analysis', description: 'Detect customer mood from messages.', wuCost: 8, revenueBoost: 0, qualityBoost: 16, unlockRequires: ['ai_features'] },
+			{ id: 'cat_ai_cs_handoff', name: 'Human Handoff', description: 'Seamlessly escalate to a human agent.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] }
 		]
 	}
 };

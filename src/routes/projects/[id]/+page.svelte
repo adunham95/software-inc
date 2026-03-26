@@ -44,7 +44,7 @@
 	const majorCount = $derived(unfixedBugs.filter((b) => b.severity === 'major').length);
 	const minorCount = $derived(unfixedBugs.filter((b) => b.severity === 'minor').length);
 
-	const escalationStage = $derived(() => {
+	const escalationStage = $derived.by(() => {
 		if (!project) return 0;
 		const week = $game.meta.week;
 		const criticalUnfixed = unfixedBugs.filter((b) => b.severity === 'critical');
@@ -71,6 +71,13 @@
 
 	const activePatch = $derived(
 		$game.activePatchJob?.projectId === id ? $game.activePatchJob : null
+	);
+
+	const hasMajorReleaseInDev = $derived(
+		$game.projects.some((p) => p.isMajorRelease && p.status === 'in_development')
+	);
+	const canPlanMajorRelease = $derived(
+		!hasMajorReleaseInDev && $game.activePatchJob === null
 	);
 
 	function togglePatchBug(bugId: string) {
@@ -487,7 +494,7 @@
 				<p class="text-sm text-green-400">✅ No active bugs — all clear!</p>
 			{:else}
 				<!-- Escalation stage -->
-				{@const stage = escalationStage()}
+				{@const stage = escalationStage}
 				{#if stage >= 3}
 					<div class="mb-3 rounded-lg bg-red-950 px-3 py-2 text-xs font-semibold text-red-400">💀 STAGE 3 — Product Dead</div>
 				{:else if stage >= 2}
@@ -551,11 +558,45 @@
 			</div>
 		</div>
 
+		<!-- Major Release -->
+		<div class="bg-navy-700 rounded-xl p-4">
+			<div class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-500">Major Release</div>
+			{#if hasMajorReleaseInDev}
+				<p class="text-xs text-gray-500">A major release is already in development.</p>
+			{:else if $game.activePatchJob !== null}
+				<p class="text-xs text-gray-500">Complete the active patch before planning a major release.</p>
+			{:else}
+				<a
+					href="/projects/new?majorFrom={project.id}"
+					class="block w-full rounded-xl border border-purple-700 py-2.5 text-center text-sm font-semibold text-purple-300 transition-colors hover:bg-purple-950"
+				>
+					📦 Plan Major Release →
+				</a>
+			{/if}
+		</div>
+
 	{:else if project.status === 'archived'}
 		<div class="rounded-xl border border-gray-700 bg-gray-950 p-6 text-center text-gray-500">
 			<div class="mb-1 text-2xl">📦</div>
 			<div class="mb-1 text-sm font-semibold text-gray-400">Archived — superseded by a newer version</div>
 			<div class="text-xs">Lifetime Revenue: ${Math.round(project.totalRevenue).toLocaleString()}</div>
+		</div>
+
+		<!-- Major Release from archived product -->
+		<div class="bg-navy-700 rounded-xl p-4">
+			<div class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-500">Major Release</div>
+			{#if hasMajorReleaseInDev}
+				<p class="text-xs text-gray-500">A major release is already in development.</p>
+			{:else if $game.activePatchJob !== null}
+				<p class="text-xs text-gray-500">Complete the active patch before planning a major release.</p>
+			{:else}
+				<a
+					href="/projects/new?majorFrom={project.id}"
+					class="block w-full rounded-xl border border-purple-700 py-2.5 text-center text-sm font-semibold text-purple-300 transition-colors hover:bg-purple-950"
+				>
+					📦 Plan Major Release →
+				</a>
+			{/if}
 		</div>
 
 	{:else}
