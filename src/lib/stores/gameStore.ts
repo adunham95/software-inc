@@ -23,6 +23,10 @@ function migrateSave(raw: GameState): GameState {
 	if (raw.activePatchJobs === undefined) {
 		raw = { ...raw, activePatchJobs: [] };
 	}
+	// Add platforms if missing
+	if (!raw.platforms) {
+		raw = { ...raw, platforms: [] };
+	}
 	// Add hosting fields to existing projects if missing
 	// Also add all new fields from Categories + Bugs specs
 	raw = {
@@ -49,7 +53,12 @@ function migrateSave(raw: GameState): GameState {
 				passiveLevel: 'none',
 				activeCampaign: null,
 				campaignHistory: []
-			}
+			},
+			// Platform fields
+			platformId: p.platformId ?? null,
+			isPlatformApi: p.isPlatformApi ?? false,
+			isLandingPage: p.isLandingPage ?? false,
+			platformBonus: p.platformBonus ?? 0
 		}))
 	};
 	// Add upfrontCost to research tree nodes if missing (merge with defaults)

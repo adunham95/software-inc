@@ -90,5 +90,15 @@ export const RESEARCH_TREE: ResearchNode[] = [
 		unlocks: 'Unlocks In-App Purchases, +25% revenue',
 		requires: ['agile_process'],
 		category: 'backend'
+	},
+	{
+		id: 'platform_architecture',
+		name: 'Platform Architecture',
+		description: 'Learn to design and build multi-product platforms around a shared API.',
+		weeksToComplete: 6,
+		upfrontCost: 5000,
+		unlocks: 'Platform creation, API product type',
+		requires: ['cloud_hosting', 'security'],
+		category: 'infrastructure'
 	}
 ];

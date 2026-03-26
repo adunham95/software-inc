@@ -1,4 +1,5 @@
 export type ProjectType =
+	| 'api'
 	| 'basic_website'
 	| 'browser_ext'
 	| 'mobile_app'
@@ -104,12 +105,47 @@ export interface MarketingState {
 	campaignHistory: CampaignType[];
 }
 
+export type ApiCategory =
+	| 'social_network'
+	| 'developer_platform'
+	| 'ecommerce'
+	| 'media_streaming'
+	| 'productivity_suite'
+	| 'fintech';
+
+export interface Platform {
+	id: string;
+	name: string;
+	description: string;
+	weekCreated: number;
+	apiCategory: ApiCategory;
+	pricePerCall: number;
+
+	apiProjectId: string | null;
+	subProductIds: string[];
+
+	sharedUsers: number;
+	weeklyNewUsers: number;
+	weeklyChurnedUsers: number;
+
+	brandStrength: number;
+	marketingBonus: number;
+
+	status: 'building' | 'live' | 'degraded' | 'offline';
+}
+
 export interface Project {
 	id: string;
 	name: string;
 	type: ProjectType;
 	category: ProjectCategory | null;
 	status: 'in_development' | 'shipped' | 'dead' | 'archived' | 'cancelled';
+
+	// Platform fields
+	platformId: string | null;
+	isPlatformApi: boolean;
+	isLandingPage: boolean;
+	platformBonus: number;
 
 	pricingModel: 'one_time' | 'subscription';
 	price: number;
@@ -198,6 +234,7 @@ export interface GameState {
 		totalEarned: number;
 	};
 	projects: Project[];
+	platforms: Platform[];
 	research: ResearchState;
 	notifications: Notification[];
 	expenses: ExpenseState;

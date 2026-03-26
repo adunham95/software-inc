@@ -12,6 +12,7 @@ export function defaultGameState(): GameState {
 			totalEarned: 0
 		},
 		projects: [],
+		platforms: [],
 		research: {
 			completed: [],
 			inProgress: null,

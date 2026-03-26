@@ -4,6 +4,7 @@ export const PROJECT_TYPES: Record<
 	ProjectType,
 	{ label: string; baseWu: number; requires: string[]; laptopTierMin: LaptopTier }
 > = {
+	api: { label: 'Platform API', baseWu: 50, requires: ['platform_architecture'], laptopTierMin: 2 },
 	basic_website: { label: 'Basic Website', baseWu: 8, requires: [], laptopTierMin: 1 },
 	browser_ext: { label: 'Browser Extension', baseWu: 10, requires: [], laptopTierMin: 1 },
 	mobile_app: { label: 'Mobile App', baseWu: 30, requires: ['mobile_dev'], laptopTierMin: 2 },
@@ -16,6 +17,7 @@ export const PRICE_RANGES: Record<
 	ProjectType,
 	{ oneTime: [number, number]; subscription: [number, number] }
 > = {
+	api: { oneTime: [0.001, 0.05], subscription: [0.001, 0.05] },
 	basic_website: { oneTime: [0.5, 5], subscription: [1, 3] },
 	browser_ext: { oneTime: [1, 15], subscription: [1, 5] },
 	mobile_app: { oneTime: [2, 20], subscription: [3, 15] },
@@ -26,6 +28,7 @@ export const PRICE_RANGES: Record<
 
 // Hosting costs per product type (external = $/wk, self = WU/wk)
 export const HOSTING_EXTERNAL_COST: Partial<Record<ProjectType, number>> = {
+	api: 500,
 	mobile_app: 150,
 	saas: 400,
 	desktop_app: 100,
@@ -33,6 +36,7 @@ export const HOSTING_EXTERNAL_COST: Partial<Record<ProjectType, number>> = {
 };
 
 export const HOSTING_WU_DRAIN: Partial<Record<ProjectType, number>> = {
+	api: 3,
 	mobile_app: 1,
 	saas: 2,
 	desktop_app: 1,
@@ -40,7 +44,7 @@ export const HOSTING_WU_DRAIN: Partial<Record<ProjectType, number>> = {
 };
 
 // Types that need hosting (browser_ext has 'none')
-export const NEEDS_HOSTING: ProjectType[] = ['mobile_app', 'saas', 'desktop_app', 'ai_product'];
+export const NEEDS_HOSTING: ProjectType[] = ['api', 'mobile_app', 'saas', 'desktop_app', 'ai_product'];
 
 // Laptop tier definitions
 export const LAPTOP_TIERS: Record<
@@ -95,6 +99,15 @@ export const SELF_COST_TIERS = {
 type FeatureTemplate = Omit<ProjectFeature, 'status' | 'progressWu'>;
 
 export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
+	api: [
+		{ id: 'api_auth', name: 'Authentication', description: 'Enables User Auth on all sub-products for free.', wuCost: 10, revenueBoost: 0, qualityBoost: 10, unlockRequires: ['security'] },
+		{ id: 'api_rate_limit', name: 'Rate Limiting', description: 'Reduces outage risk by 30%.', wuCost: 6, revenueBoost: 0, qualityBoost: 8, unlockRequires: [] },
+		{ id: 'api_analytics', name: 'Analytics Endpoint', description: '+15% API revenue.', wuCost: 8, revenueBoost: 15, qualityBoost: 7, unlockRequires: ['web_basics'] },
+		{ id: 'api_webhooks', name: 'Webhooks', description: 'Unlocks Webhook features on sub-products.', wuCost: 8, revenueBoost: 0, qualityBoost: 8, unlockRequires: ['web_basics'] },
+		{ id: 'api_sdks', name: 'SDKs (JS, Python)', description: '+20% API revenue, -1 WU cost on sub-product features.', wuCost: 10, revenueBoost: 20, qualityBoost: 9, unlockRequires: [] },
+		{ id: 'api_graphql', name: 'GraphQL Support', description: '+25% API revenue.', wuCost: 10, revenueBoost: 25, qualityBoost: 9, unlockRequires: ['web_basics'] },
+		{ id: 'api_admin', name: 'Admin Console', description: '+10% platform brand strength/wk.', wuCost: 8, revenueBoost: 0, qualityBoost: 8, unlockRequires: ['ui_ux'] }
+	],
 	basic_website: [
 		{
 			id: 'bw_contact',
@@ -509,6 +522,7 @@ export const ADVERTISING_FEATURE: FeatureTemplate = {
 
 // Ad revenue per user per week by project type
 export const AD_RATE_PER_USER: Record<ProjectType, number> = {
+	api: 0,
 	basic_website: 0.08,
 	browser_ext: 0.05,
 	mobile_app: 0.04,
@@ -519,6 +533,7 @@ export const AD_RATE_PER_USER: Record<ProjectType, number> = {
 
 // Valid categories per project type
 export const CATEGORIES_FOR_TYPE: Record<ProjectType, ProjectCategory[]> = {
+	api: [],
 	basic_website: ['blog', 'news', 'portfolio', 'landing_page', 'community_forum'],
 	mobile_app: ['dating', 'chat', 'entertainment', 'fitness', 'education'],
 	saas: ['productivity', 'crm', 'analytics', 'devtools', 'finance'],
@@ -559,6 +574,7 @@ export const CATEGORY_LABELS: Partial<Record<ProjectCategory, string>> = {
 };
 
 export const CATEGORY_FEATURE_POOLS: Record<ProjectType, Partial<Record<ProjectCategory, FeatureTemplate[]>>> = {
+	api: {},
 	basic_website: {
 		blog: [
 			{ id: 'cat_bw_blog_editor', name: 'Post Editor', description: 'Rich-text editor for publishing posts.', wuCost: 6, revenueBoost: 0, qualityBoost: 14, unlockRequires: [] },
@@ -771,3 +787,82 @@ export const CATEGORY_FEATURE_POOLS: Record<ProjectType, Partial<Record<ProjectC
 		]
 	}
 };
+
+// API call rates per user per week by platform category
+export const API_CALL_RATES: Record<string, number> = {
+	social_network: 120,
+	developer_platform: 80,
+	ecommerce: 50,
+	media_streaming: 200,
+	productivity_suite: 40,
+	fintech: 60
+};
+
+// Platform sub-product conversion rates (fraction of shared users who pay for each product type)
+export const PLATFORM_CONVERSION_RATES: Partial<Record<ProjectType, number>> = {
+	mobile_app: 0.35,
+	saas: 0.15,
+	desktop_app: 0.20
+};
+
+// Which API features unlock which sub-product features
+// Map: apiFeatureId → { subProductType → featureIds[] }
+export const API_FEATURE_UNLOCK_MAP: Record<string, Partial<Record<ProjectType, string[]>>> = {
+	api_auth: {
+		mobile_app: ['ma_user_auth', 'ma_purchases'],
+		saas: ['saas_auth_teams', 'saas_admin'],
+		desktop_app: ['da_cloud_sync', 'da_auto_updater']
+	},
+	api_webhooks: {
+		mobile_app: ['ma_social_share', 'ma_analytics'],
+		saas: ['saas_webhooks', 'saas_email_notif'],
+		desktop_app: ['da_plugin_system']
+	},
+	api_analytics: {
+		mobile_app: ['ma_analytics'],
+		saas: ['saas_dashboards', 'saas_funnel_reports']
+	},
+	api_sdks: {
+		mobile_app: ['ma_offline', 'ma_push_notif'],
+		saas: ['saas_rest_api', 'saas_csv_export', 'saas_data_export'],
+		desktop_app: ['da_keyboard_shortcuts', 'da_multi_lang']
+	},
+	api_graphql: {
+		mobile_app: ['ma_in_app_chat'],
+		saas: ['saas_ai_automation']
+	},
+	api_admin: {
+		mobile_app: ['ma_dark_mode', 'ma_social_share'],
+		saas: ['saas_custom_branding'],
+		desktop_app: ['da_dark_mode']
+	},
+	api_rate_limit: {
+		desktop_app: ['da_offline', 'da_auto_updater']
+	}
+};
+
+// All feature IDs that require an API unlock (used to filter feature pool for sub-products)
+export const ALL_API_GATED_FEATURE_IDS = new Set(
+	Object.values(API_FEATURE_UNLOCK_MAP).flatMap((byType) =>
+		Object.values(byType).flatMap((ids) => ids ?? [])
+	)
+);
+
+/**
+ * Returns the set of feature IDs a sub-product is allowed to include,
+ * based on which API features were complete at sub-product creation time.
+ * This is computed once at creation and stored on the project.
+ */
+export function getUnlockedSubProductFeatures(
+	apiCompletedFeatureIds: string[],
+	subProductType: ProjectType
+): Set<string> {
+	const unlocked = new Set<string>();
+	for (const apiFeatureId of apiCompletedFeatureIds) {
+		const byType = API_FEATURE_UNLOCK_MAP[apiFeatureId];
+		if (!byType) continue;
+		const featureIds = byType[subProductType];
+		if (featureIds) featureIds.forEach((id) => unlocked.add(id));
+	}
+	return unlocked;
+}

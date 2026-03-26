@@ -21,10 +21,33 @@
 	import { SELF_COST_TIERS, HOSTING_EXTERNAL_COST, HOSTING_WU_DRAIN } from '$lib/engine/projects';
 	import type { Notification } from '$lib/types';
 
-	const inDevProjects = $derived($game.projects.filter((p) => p.status === 'in_development'));
+	// All in-dev projects shown (platform products show too since you can only build one at a time)
+	const inDevProjects = $derived(
+		$game.projects.filter((p) => p.status === 'in_development')
+	);
 	const activeCount = $derived(inDevProjects.length + $shippedProjects.length);
-	const liveProjects = $derived($shippedProjects.filter((p) => p.status === 'shipped'));
-	const deadProjects = $derived($shippedProjects.filter((p) => p.status === 'dead'));
+	const liveProjects = $derived(
+		$shippedProjects.filter((p) => p.status === 'shipped' && !p.platformId)
+	);
+	const deadProjects = $derived(
+		$shippedProjects.filter((p) => p.status === 'dead' && !p.platformId)
+	);
+
+	// Platforms summary
+	const platforms = $derived($game.platforms ?? []);
+
+	function platformTotalRevenue(platformId: string): number {
+		return $game.projects
+			.filter((p) => p.platformId === platformId && p.status === 'shipped')
+			.reduce((sum, p) => sum + p.weeklyRevenue, 0);
+	}
+
+	const PLATFORM_STATUS_CLASS: Record<string, string> = {
+		building: 'bg-gray-700 text-gray-300',
+		live: 'bg-green-900 text-green-300',
+		degraded: 'bg-yellow-900 text-yellow-300',
+		offline: 'bg-red-900 text-red-400'
+	};
 
 	const lifestyleTier = $derived(SELF_COST_TIERS[$game.expenses.selfCostTier]);
 
@@ -232,6 +255,36 @@
 			{/if}
 		</div>
 	</section>
+
+	<!-- Platforms -->
+	{#if platforms.length > 0}
+		<section>
+			<div class="mb-3 flex items-center justify-between">
+				<h2 class="text-xs font-semibold tracking-widest text-gray-500 uppercase">Platforms</h2>
+				<a href="/platforms" class="text-xs text-neon">View All →</a>
+			</div>
+			<div class="space-y-2">
+				{#each platforms as platform (platform.id)}
+					<a
+						href="/platforms/{platform.id}"
+						class="block rounded-xl border border-gray-700 bg-gray-800/60 p-4 transition hover:border-gray-500"
+					>
+						<div class="flex items-center justify-between mb-1">
+							<p class="text-white font-semibold">{platform.name}</p>
+							<span class="text-[10px] font-bold px-2 py-0.5 rounded-full {PLATFORM_STATUS_CLASS[platform.status]}">
+								{platform.status.toUpperCase()}
+							</span>
+						</div>
+						<div class="flex gap-4 text-xs text-gray-400">
+							<span>Rev: <span class="text-green-400">${platformTotalRevenue(platform.id).toLocaleString()}/wk</span></span>
+							<span>Users: <span class="text-white">{platform.sharedUsers.toLocaleString()}</span></span>
+							<span>Brand: <span class="text-purple-400">{Math.round(platform.brandStrength)}</span></span>
+						</div>
+					</a>
+				{/each}
+			</div>
+		</section>
+	{/if}
 
 	<!-- Live Products -->
 	{#if liveProjects.length > 0}
