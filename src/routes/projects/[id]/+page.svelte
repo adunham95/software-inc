@@ -551,7 +551,7 @@
 								>
 								<span class="text-sm text-gray-300">{bug.description}</span>
 							</div>
-							<span class="shrink-0 font-mono text-xs text-red-400">-${bug.revenueImpact}/wk</span>
+							<span class="shrink-0 font-mono text-xs text-red-400">-{(bug.revenueImpact * 100).toFixed(1)}%/wk</span>
 						</div>
 					{/each}
 				</div>
@@ -681,7 +681,7 @@
 								<span class="text-sm text-white">{bug.description}</span>
 							</div>
 							<div class="ml-2 shrink-0 text-right text-xs">
-								<div class="text-red-400">-${bug.revenueImpact}/wk</div>
+								<div class="text-red-400">-{(bug.revenueImpact * 100).toFixed(1)}%/wk</div>
 								<div class="text-gray-400">{bugWuCost(bug)} WU</div>
 							</div>
 						</div>

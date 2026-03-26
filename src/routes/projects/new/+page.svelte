@@ -112,7 +112,7 @@
 				.map((b) => ({
 					id: `bugfix_${b.id}`,
 					name: `Fix: ${b.description}`,
-					description: `Bug fix (${b.severity}) — -$${b.revenueImpact}/wk removed`,
+					description: `Bug fix (${b.severity}) — -${(b.revenueImpact * 100).toFixed(1)}%/wk removed`,
 					wuCost: bugFixWuCost(b),
 					revenueBoost: 0,
 					qualityBoost: 1,
@@ -152,7 +152,6 @@
 		)
 	);
 
-	const hasActiveProject = $derived($game.projects.some((p) => p.status === 'in_development'));
 	const hasPatchJob = $derived($game.activePatchJob !== null);
 	const hasMajorReleaseInDev = $derived(
 		$game.projects.some((p) => p.isMajorRelease && p.status === 'in_development')
@@ -162,7 +161,6 @@
 		name.trim().length > 0 &&
 			selectedFeatureIds.length > 0 &&
 			category !== null &&
-			!hasActiveProject &&
 			!hasPatchJob &&
 			wu > 0 &&
 			(!isMajorRelease || !hasMajorReleaseInDev)
@@ -277,11 +275,6 @@
 			<div class="text-xs text-purple-400">
 				Previously completed features cost half WU. Unfixed bugs are included as fix items.
 			</div>
-		</div>
-	{/if}
-	{#if hasActiveProject}
-		<div class="rounded-xl border border-yellow-700 bg-yellow-950 p-4 text-sm text-yellow-300">
-			⚠️ You already have a project in development. Complete or cancel it before starting a new one.
 		</div>
 	{/if}
 	{#if hasPatchJob}

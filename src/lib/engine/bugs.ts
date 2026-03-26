@@ -48,15 +48,15 @@ export function generateBug(project: Project, week: number, forcedSeverity?: Bug
 
 	if (sev === 'minor') {
 		severity = 'minor';
-		revenueImpact = Math.round(5 + Math.random() * 15);
+		revenueImpact = parseFloat((0.01 + Math.random() * 0.04).toFixed(3)); // 1–5%
 		description = pick(MINOR_DESCRIPTIONS);
 	} else if (sev === 'major') {
 		severity = 'major';
-		revenueImpact = Math.round(50 + Math.random() * 100);
+		revenueImpact = parseFloat((0.05 + Math.random() * 0.1).toFixed(3)); // 5–15%
 		description = pick(MAJOR_DESCRIPTIONS);
 	} else {
 		severity = 'critical';
-		revenueImpact = Math.round(300 + Math.random() * 500);
+		revenueImpact = parseFloat((0.15 + Math.random() * 0.25).toFixed(3)); // 15–40%
 		description = pick(CRITICAL_DESCRIPTIONS);
 	}
 
@@ -71,7 +71,7 @@ export function generateBug(project: Project, week: number, forcedSeverity?: Bug
 }
 
 export function calcBugsThisWeek(project: Project): number {
-	const baseRate = 0.4;
+	const baseRate = 0.1;
 	const qualityFactor = 1 - project.quality / 100;
 	const ageFactor = 1 + project.weeksOnMarket * 0.05;
 	return baseRate * qualityFactor * ageFactor;
@@ -92,10 +92,7 @@ export function checkEscalation(state: GameState): GameState {
 			: 0;
 
 		// Stage 3: Product death
-		if (
-			(unfixedCount >= 10 || oldestCriticalAge >= 6) &&
-			project.status !== 'dead'
-		) {
+		if ((unfixedCount >= 10 || oldestCriticalAge >= 6) && project.status !== 'dead') {
 			s = {
 				...s,
 				meta: { ...s.meta, reputation: Math.max(0, s.meta.reputation - 10) },

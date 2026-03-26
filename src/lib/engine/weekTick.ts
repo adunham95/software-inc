@@ -83,12 +83,22 @@ export function advanceWeek(state: GameState): GameState {
 		}
 	}
 
-	// 2. Tick active development project (only if no patch running)
-	const activeProject = s.projects.find((p) => p.status === 'in_development');
+	// 2. Tick active development projects — priority queue: newest weekStarted first
+	//    Each project gets as much WU as it needs; remainder flows to the next.
+	const activeProjects = s.projects
+		.filter((p) => p.status === 'in_development')
+		.sort((a, b) => b.weekStarted - a.weekStarted);
+
+	let wuRemaining = wuForProject;
 	let newPendingHostingId: string | null = s.pendingHostingChoiceId;
 
-	if (activeProject && wuForProject > 0) {
-		const updated = tickActiveProject(activeProject, wuForProject);
+	for (const activeProject of activeProjects) {
+		if (wuRemaining <= 0) break;
+
+		const wuBefore = activeProject.features.reduce((sum, f) => sum + f.progressWu, 0);
+		const updated = tickActiveProject(activeProject, wuRemaining);
+		const wuAfter = updated.features.reduce((sum, f) => sum + f.progressWu, 0);
+		wuRemaining -= wuAfter - wuBefore;
 
 		// Check if all features complete → ship!
 		const allComplete = updated.features.every((f) => f.status === 'complete');
@@ -115,15 +125,12 @@ export function advanceWeek(state: GameState): GameState {
 			if (shipped.isMajorRelease && shipped.parentProjectId) {
 				const parent = s.projects.find((p) => p.id === shipped.parentProjectId);
 				if (parent) {
-					// Archive the parent project
 					s.projects = s.projects.map((p) =>
 						p.id === parent.id
 							? { ...p, status: 'archived' as const, archivedWeek: week }
 							: p
 					);
-					// Reputation +5 for shipping a major release
 					s.meta = { ...s.meta, reputation: Math.min(100, s.meta.reputation + 5) };
-					// Bugs from parent that weren't addressed by bugfix features carry over
 					const addressedBugIds = new Set(
 						shipped.features
 							.filter((f) => f.id.startsWith('bugfix_'))
@@ -132,7 +139,6 @@ export function advanceWeek(state: GameState): GameState {
 					const carryOverBugs = parent.bugs.filter(
 						(b) => !b.fixed && !addressedBugIds.has(b.id)
 					);
-					// Launch boost: brand recognition from previous product
 					const launchBoostFactor = 1 + (s.meta.reputation / 100) * 0.3;
 					shipped = {
 						...shipped,
@@ -153,7 +159,6 @@ export function advanceWeek(state: GameState): GameState {
 
 			s.projects = s.projects.map((p) => (p.id === shipped.id ? shipped : p));
 
-			// Trigger hosting choice modal for products that need hosting
 			if (needsHosting) {
 				newPendingHostingId = shipped.id;
 			}
@@ -238,9 +243,9 @@ export function advanceWeek(state: GameState): GameState {
 		// Tick revenue
 		let ticked = tickShippedProject(p);
 
-		// Apply bug revenue impact
+		// Apply bug revenue impact (each bug's revenueImpact is a fraction of weekly revenue)
 		const unfixedBugs = ticked.bugs.filter((b) => !b.fixed);
-		const bugLoss = unfixedBugs.reduce((sum, b) => sum + b.revenueImpact, 0);
+		const bugLoss = unfixedBugs.reduce((sum, b) => sum + b.revenueImpact * ticked.weeklyRevenue, 0);
 
 		// Escalation revenue penalty
 		const unfixedCount = unfixedBugs.length;
