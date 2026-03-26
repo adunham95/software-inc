@@ -325,14 +325,14 @@
 						onclick={() => (showAllTypes = false)}
 						class="rounded px-3 py-1 text-xs font-medium transition-colors"
 						class:bg-neon={!showAllTypes}
-						class:text-navy={!showAllTypes}
+						class:text-white={!showAllTypes}
 						class:text-gray-400={showAllTypes}
 					>Available</button>
 					<button
 						onclick={() => (showAllTypes = true)}
 						class="rounded px-3 py-1 text-xs font-medium transition-colors"
 						class:bg-neon={showAllTypes}
-						class:text-navy={showAllTypes}
+						class:text-white={showAllTypes}
 						class:text-gray-400={!showAllTypes}
 					>All</button>
 				</div>
@@ -379,7 +379,7 @@
 					class="rounded-xl border px-3 py-2.5 text-sm font-medium transition-all text-left"
 					class:border-neon={category === cat}
 					class:bg-neon={category === cat}
-					class:text-navy={category === cat}
+					class:text-white={category === cat}
 					class:border-navy-600={category !== cat}
 					class:bg-navy-700={category !== cat}
 					class:text-gray-300={category !== cat}
@@ -398,7 +398,7 @@
 				onclick={() => (pricingModel = 'one_time')}
 				class="flex-1 rounded-lg py-2 text-sm font-medium transition-colors"
 				class:bg-neon={pricingModel === 'one_time'}
-				class:text-navy={pricingModel === 'one_time'}
+				class:text-white={pricingModel === 'one_time'}
 				class:text-gray-400={pricingModel !== 'one_time'}
 			>
 				One-Time
@@ -407,7 +407,7 @@
 				onclick={() => (pricingModel = 'subscription')}
 				class="flex-1 rounded-lg py-2 text-sm font-medium transition-colors"
 				class:bg-neon={pricingModel === 'subscription'}
-				class:text-navy={pricingModel === 'subscription'}
+				class:text-white={pricingModel === 'subscription'}
 				class:text-gray-400={pricingModel !== 'subscription'}
 			>
 				Subscription
@@ -528,7 +528,7 @@
 		disabled={!canStart}
 		class="w-full rounded-xl py-4 font-mono font-bold transition-colors"
 		class:bg-neon={canStart}
-		class:text-navy={canStart}
+		class:text-white={canStart}
 		class:hover:bg-neon-dim={canStart}
 		class:bg-navy-600={!canStart}
 		class:text-gray-500={!canStart}

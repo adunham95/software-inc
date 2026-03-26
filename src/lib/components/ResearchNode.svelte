@@ -107,7 +107,7 @@
 
 	{#if isAvailable}
 		<button
-			class="border-neon text-neon hover:bg-neon hover:text-navy mt-3 w-full rounded-lg border py-1.5 text-xs font-semibold transition-colors"
+			class="border-neon text-neon hover:bg-neon hover:text-white mt-3 w-full rounded-lg border py-1.5 text-xs font-semibold transition-colors"
 			onclick={() => onStart(node.id)}
 		>
 			Start Research — ${node.upfrontCost.toLocaleString()}

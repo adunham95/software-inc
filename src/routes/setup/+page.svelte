@@ -117,7 +117,7 @@
 					disabled={!canAffordUpgrade}
 					class="w-full rounded-xl py-3 text-sm font-bold transition-colors"
 					class:bg-neon={canAffordUpgrade}
-					class:text-navy={canAffordUpgrade}
+					class:text-white={canAffordUpgrade}
 					class:bg-navy-600={!canAffordUpgrade}
 					class:text-gray-500={!canAffordUpgrade}
 					class:cursor-not-allowed={!canAffordUpgrade}

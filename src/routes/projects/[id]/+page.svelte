@@ -527,7 +527,7 @@
 				{#if !activePatch && !$game.activePatchJob}
 					<button
 						onclick={() => { showPatchModal = true; patchSelectedBugIds = []; }}
-						class="bg-neon text-navy w-full rounded-xl py-2.5 text-sm font-semibold"
+						class="bg-neon text-white w-full rounded-xl py-2.5 text-sm font-semibold"
 					>
 						🩹 Release Patch →
 					</button>
@@ -657,7 +657,7 @@
 					disabled={patchSelectedBugIds.length === 0}
 					class="flex-1 rounded-xl py-3 text-sm font-semibold transition-colors"
 					class:bg-neon={patchSelectedBugIds.length > 0}
-					class:text-navy={patchSelectedBugIds.length > 0}
+					class:text-white={patchSelectedBugIds.length > 0}
 					class:bg-navy-600={patchSelectedBugIds.length === 0}
 					class:text-gray-500={patchSelectedBugIds.length === 0}
 					class:cursor-not-allowed={patchSelectedBugIds.length === 0}

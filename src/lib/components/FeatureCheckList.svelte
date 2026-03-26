@@ -35,12 +35,12 @@
 		<label
 			class="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-all
 				{checked && !locked ? 'border-neon bg-neon/5' : 'border-navy-600 bg-navy-700'}
-				{locked ? 'opacity-50 cursor-not-allowed' : ''}"
+				{locked ? 'cursor-not-allowed opacity-50' : ''}"
 		>
 			<input
 				type="checkbox"
-				class="border-navy-500 bg-navy-600 checked:bg-neon checked:border-neon mt-0.5 shrink-0 rounded"
-				checked={checked}
+				class="border-navy-500 mt-0.5 shrink-0 rounded bg-navy-600 checked:border-neon checked:bg-neon"
+				{checked}
 				disabled={locked}
 				onchange={() => !locked && onToggle(feat.id)}
 			/>
@@ -49,7 +49,6 @@
 					<span class="text-sm font-medium text-white">{feat.name}</span>
 					<div class="flex shrink-0 gap-2 text-xs text-gray-400">
 						<span class="font-mono">{feat.wuCost} WU</span>
-						<span class="text-green-400">+${feat.revenueBoost}/wk</span>
 						<span class="text-blue-400">+{feat.qualityBoost} Q</span>
 					</div>
 				</div>

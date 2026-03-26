@@ -105,7 +105,7 @@
 				</button>
 				<button
 					onclick={() => pendingResearchId && startResearch(pendingResearchId)}
-					class="bg-neon text-navy flex-1 rounded-xl py-3 text-sm font-bold"
+					class="bg-neon text-white flex-1 rounded-xl py-3 text-sm font-bold"
 				>
 					Switch Research
 				</button>
@@ -123,7 +123,7 @@
 				onclick={() => (activeTab = cat.id)}
 				class="shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
 				class:bg-neon={activeTab === cat.id}
-				class:text-navy={activeTab === cat.id}
+				class:text-white={activeTab === cat.id}
 				class:bg-navy-700={activeTab !== cat.id}
 				class:text-gray-400={activeTab !== cat.id}
 			>

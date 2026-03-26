@@ -32,7 +32,7 @@
 			/>
 			<button
 				onclick={saveName}
-				class="bg-neon text-navy rounded-lg px-4 py-2 font-mono text-sm font-semibold transition-opacity hover:opacity-80"
+				class="bg-neon text-white rounded-lg px-4 py-2 font-mono text-sm font-semibold transition-opacity hover:opacity-80"
 			>
 				Save
 			</button>

@@ -16,7 +16,7 @@
 	<button
 		onclick={handleAdvance}
 		disabled={advancing}
-		class="bg-neon text-navy hover:bg-neon-dim w-full rounded-xl py-3.5 font-mono text-base font-bold transition-colors disabled:opacity-60"
+		class="bg-neon text-white hover:bg-neon-dim w-full rounded-xl py-3.5 font-mono text-base font-bold transition-colors disabled:opacity-60"
 	>
 		{advancing ? '...' : '⏭ Advance Week'}
 	</button>

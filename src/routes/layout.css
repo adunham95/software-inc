@@ -7,8 +7,10 @@
 	--color-navy-800: #161b22;
 	--color-navy-700: #1c2130;
 	--color-navy-600: #21262d;
-	--color-neon: #00ff87;
-	--color-neon-dim: #00cc6a;
+	--color-neon: #0076FF;
+	--color-neon-dim: #005FCC;
+	--color-secondary: #00C9A7;
+	--color-secondary-dim: #00A88C;
 	--font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
 	--font-sans: 'Inter', system-ui, sans-serif;
 }
