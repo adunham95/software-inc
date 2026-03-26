@@ -2,8 +2,8 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { game } from '$lib/stores/gameStore';
-	import { wuPerWeek } from '$lib/stores/derived';
-	import { PROJECT_TYPES } from '$lib/engine/projects';
+	import { availableWu } from '$lib/stores/derived';
+	import { PROJECT_TYPES, HOSTING_EXTERNAL_COST, HOSTING_WU_DRAIN } from '$lib/engine/projects';
 	import FeatureProgress from '$lib/components/FeatureProgress.svelte';
 	import RevenueChart from '$lib/components/RevenueChart.svelte';
 	import type { Notification } from '$lib/types';
@@ -13,6 +13,7 @@
 	const typeLabel = $derived(project ? (PROJECT_TYPES[project.type]?.label ?? project.type) : '');
 
 	let showCancelConfirm = $state(false);
+	let showHostingSwitch = $state(false);
 
 	const currentFeature = $derived(
 		project?.features.find((f) => f.status === 'in_progress') ?? null
@@ -22,10 +23,18 @@
 		project && project.status === 'in_development'
 			? Math.ceil(
 					(project.features.reduce((s, f) => s + (f.wuCost - f.progressWu), 0)) /
-						$wuPerWeek
+						$availableWu
 				)
 			: 0
 	);
+
+	const externalCost = $derived(
+		project ? (HOSTING_EXTERNAL_COST[project.type] ?? 0) : 0
+	);
+	const selfWuDrain = $derived(
+		project ? (HOSTING_WU_DRAIN[project.type] ?? 0) : 0
+	);
+	const wuAfterSwitch = $derived($availableWu - selfWuDrain);
 
 	function cancelProject() {
 		if (!project) return;
@@ -45,6 +54,32 @@
 			] as Notification[]).slice(0, 50)
 		}));
 		goto('/');
+	}
+
+	function switchHosting(newType: 'external' | 'self') {
+		if (!project) return;
+		const newCost = newType === 'external' ? externalCost : 0;
+		const newDrain = newType === 'self' ? selfWuDrain : 0;
+		game.update((s) => ({
+			...s,
+			projects: s.projects.map((p) =>
+				p.id === id
+					? { ...p, hostingType: newType, hostingCostPerWeek: newCost, hostingWuDrainPerWeek: newDrain }
+					: p
+			),
+			notifications: ([
+				{
+					id: crypto.randomUUID(),
+					week: s.meta.week,
+					message: newType === 'external'
+						? `☁️ "${project.name}" switched to external hosting — $${newCost}/wk.`
+						: `🖥️ "${project.name}" switched to self-hosting — ${newDrain} WU/wk drain.`,
+					type: 'info'
+				} satisfies Notification,
+				...s.notifications
+			] as Notification[]).slice(0, 50)
+		}));
+		showHostingSwitch = false;
 	}
 </script>
 
@@ -223,6 +258,63 @@
 				{/if}
 			</div>
 		</div>
+
+		<!-- Hosting (only for products that need hosting) -->
+		{#if project.hostingType !== 'none'}
+			<div class="bg-navy-700 rounded-xl p-4">
+				<div class="mb-3 flex items-center justify-between">
+					<div class="text-xs font-semibold uppercase tracking-widest text-gray-500">Hosting</div>
+					<button
+						onclick={() => (showHostingSwitch = !showHostingSwitch)}
+						class="text-xs text-gray-400 hover:text-white transition-colors"
+					>
+						Switch →
+					</button>
+				</div>
+
+				{#if project.hostingType === 'external'}
+					<div class="flex items-center justify-between text-sm">
+						<span class="text-white">☁️ External Hosting</span>
+						<span class="font-mono text-amber-400">-${project.hostingCostPerWeek}/wk</span>
+					</div>
+					<p class="mt-1 text-xs text-gray-500">No maintenance, no outage risk.</p>
+				{:else}
+					<div class="flex items-center justify-between text-sm">
+						<span class="text-white">🖥️ Self-Hosted</span>
+						<span class="font-mono text-orange-400">-{project.hostingWuDrainPerWeek} WU/wk</span>
+					</div>
+					<p class="mt-1 text-xs text-gray-500">5% outage risk per week (2% with DevOps).</p>
+				{/if}
+
+				{#if showHostingSwitch}
+					<div class="mt-4 space-y-2 border-t border-gray-700 pt-4">
+						<p class="mb-2 text-xs text-gray-400">Switch hosting (takes effect immediately):</p>
+						<button
+							onclick={() => switchHosting('external')}
+							disabled={project.hostingType === 'external'}
+							class="w-full rounded-xl border px-4 py-3 text-left text-sm transition-all"
+							class:border-neon={project.hostingType === 'external'}
+							class:border-gray-600={project.hostingType !== 'external'}
+							class:opacity-50={project.hostingType === 'external'}
+						>
+							<div class="font-medium text-white">☁️ External Hosting</div>
+							<div class="text-xs text-amber-400">${externalCost}/wk cash cost</div>
+						</button>
+						<button
+							onclick={() => switchHosting('self')}
+							disabled={project.hostingType === 'self'}
+							class="w-full rounded-xl border px-4 py-3 text-left text-sm transition-all"
+							class:border-neon={project.hostingType === 'self'}
+							class:border-gray-600={project.hostingType !== 'self'}
+							class:opacity-50={project.hostingType === 'self'}
+						>
+							<div class="font-medium text-white">🖥️ Self-Hosted</div>
+							<div class="text-xs text-orange-400">{selfWuDrain} WU/wk drain · leaves you {wuAfterSwitch} WU for dev</div>
+						</button>
+					</div>
+				{/if}
+			</div>
+		{/if}
 
 		<!-- Revenue Chart -->
 		{#if project.revenueHistory.length > 0}

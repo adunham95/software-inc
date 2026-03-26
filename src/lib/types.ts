@@ -1,4 +1,10 @@
-export type ProjectType = 'browser_ext' | 'mobile_app' | 'saas' | 'desktop_app' | 'ai_product';
+export type ProjectType =
+	| 'basic_website'
+	| 'browser_ext'
+	| 'mobile_app'
+	| 'saas'
+	| 'desktop_app'
+	| 'ai_product';
 
 export interface ProjectFeature {
 	id: string;
@@ -36,6 +42,11 @@ export interface Project {
 	totalRevenue: number;
 	revenueHistory: number[];
 
+	// Hosting
+	hostingType: 'external' | 'self' | 'none';
+	hostingCostPerWeek: number; // $0 if self-hosted or none
+	hostingWuDrainPerWeek: number; // 0 if external or none
+
 	weekStarted: number;
 	weekShipped: number | null;
 	techRequired: string[];
@@ -46,6 +57,7 @@ export interface ResearchNode {
 	name: string;
 	description: string;
 	weeksToComplete: number;
+	upfrontCost: number;
 	unlocks: string;
 	requires: string[];
 	category: 'frontend' | 'backend' | 'mobile' | 'ai' | 'infrastructure';
@@ -65,6 +77,15 @@ export interface Notification {
 	type: 'success' | 'warning' | 'info' | 'danger';
 }
 
+export type LaptopTier = 1 | 2 | 3 | 4 | 5;
+export type SelfCostTier = 'bedroom' | 'apartment' | 'home_office' | 'coworking';
+
+export interface ExpenseState {
+	laptopTier: LaptopTier;
+	selfCostTier: SelfCostTier;
+	weeklySelfCost: number;
+}
+
 export interface GameState {
 	meta: {
 		companyName: string;
@@ -77,4 +98,6 @@ export interface GameState {
 	projects: Project[];
 	research: ResearchState;
 	notifications: Notification[];
+	expenses: ExpenseState;
+	pendingHostingChoiceId: string | null;
 }

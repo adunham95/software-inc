@@ -6,6 +6,7 @@ export const RESEARCH_TREE: ResearchNode[] = [
 		name: 'Web Basics',
 		description: 'Master the fundamentals of web development.',
 		weeksToComplete: 2,
+		upfrontCost: 500,
 		unlocks: 'Unlocks SaaS & Desktop App projects',
 		requires: [],
 		category: 'frontend'
@@ -15,6 +16,7 @@ export const RESEARCH_TREE: ResearchNode[] = [
 		name: 'Mobile Dev',
 		description: 'Learn to build native mobile applications.',
 		weeksToComplete: 3,
+		upfrontCost: 1000,
 		unlocks: 'Unlocks Mobile App projects',
 		requires: [],
 		category: 'mobile'
@@ -24,6 +26,7 @@ export const RESEARCH_TREE: ResearchNode[] = [
 		name: 'Cloud Hosting',
 		description: 'Deploy and scale apps in the cloud.',
 		weeksToComplete: 4,
+		upfrontCost: 2500,
 		unlocks: '+20% revenue on SaaS, unlocks cloud features',
 		requires: ['web_basics'],
 		category: 'infrastructure'
@@ -33,6 +36,7 @@ export const RESEARCH_TREE: ResearchNode[] = [
 		name: 'Agile Process',
 		description: 'Ship faster with iterative development practices.',
 		weeksToComplete: 2,
+		upfrontCost: 300,
 		unlocks: '+1 WU/week productivity',
 		requires: [],
 		category: 'backend'
@@ -42,6 +46,7 @@ export const RESEARCH_TREE: ResearchNode[] = [
 		name: 'UI/UX Design',
 		description: 'Design beautiful, intuitive interfaces.',
 		weeksToComplete: 3,
+		upfrontCost: 800,
 		unlocks: 'Unlocks design features, +10 quality on all projects',
 		requires: ['web_basics'],
 		category: 'frontend'
@@ -51,6 +56,7 @@ export const RESEARCH_TREE: ResearchNode[] = [
 		name: 'AI Features',
 		description: 'Integrate machine learning into your products.',
 		weeksToComplete: 5,
+		upfrontCost: 8000,
 		unlocks: 'Unlocks AI Product type + AI features',
 		requires: ['cloud_hosting'],
 		category: 'ai'
@@ -60,7 +66,8 @@ export const RESEARCH_TREE: ResearchNode[] = [
 		name: 'DevOps',
 		description: 'Automate deployments and reduce downtime.',
 		weeksToComplete: 4,
-		unlocks: '-50% revenue decay rate',
+		upfrontCost: 3000,
+		unlocks: '-50% revenue decay rate, -60% self-hosting outage risk',
 		requires: ['cloud_hosting'],
 		category: 'infrastructure'
 	},
@@ -69,6 +76,7 @@ export const RESEARCH_TREE: ResearchNode[] = [
 		name: 'Security Hardening',
 		description: 'Protect your users and infrastructure.',
 		weeksToComplete: 3,
+		upfrontCost: 1500,
 		unlocks: 'Unlocks auth features, -30% bug rate',
 		requires: ['web_basics'],
 		category: 'backend'
@@ -78,6 +86,7 @@ export const RESEARCH_TREE: ResearchNode[] = [
 		name: 'Monetization Engine',
 		description: 'Optimize pricing and revenue streams.',
 		weeksToComplete: 3,
+		upfrontCost: 1000,
 		unlocks: 'Unlocks In-App Purchases, +25% revenue',
 		requires: ['agile_process'],
 		category: 'backend'

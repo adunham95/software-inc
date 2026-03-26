@@ -25,6 +25,12 @@ export function defaultGameState(): GameState {
 				message: 'Welcome! Your startup journey begins. Build your first product.',
 				type: 'info'
 			}
-		]
+		],
+		expenses: {
+			laptopTier: 1,
+			selfCostTier: 'bedroom',
+			weeklySelfCost: 200
+		},
+		pendingHostingChoiceId: null
 	};
 }

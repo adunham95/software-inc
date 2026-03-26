@@ -1,27 +1,45 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { game } from '$lib/stores/gameStore';
-	import { PROJECT_TYPES, FEATURE_POOLS, PRICE_RANGES } from '$lib/engine/projects';
+	import { PROJECT_TYPES, FEATURE_POOLS, PRICE_RANGES, LAPTOP_TIERS } from '$lib/engine/projects';
 	import { estimateWeeklyRevenue } from '$lib/engine/pricing';
+	import { availableWu } from '$lib/stores/derived';
 	import FeatureCheckList from '$lib/components/FeatureCheckList.svelte';
 	import type { ProjectType, ProjectFeature, Notification } from '$lib/types';
 
 	let name = $state('');
-	let type = $state<ProjectType>('browser_ext');
+	let type = $state<ProjectType>('basic_website');
+	let showAllTypes = $state(false);
 	let pricingModel = $state<'one_time' | 'subscription'>('one_time');
 	let price = $state(5);
 	let selectedFeatureIds = $state<string[]>([]);
 
 	const completedResearch = $derived($game.research.completed);
-	const wuPerWeek = $derived(completedResearch.includes('agile_process') ? 6 : 5);
+	const laptopTier = $derived($game.expenses.laptopTier);
+	const wu = $derived($availableWu);
 
-	const availableTypes = $derived(
-		(Object.keys(PROJECT_TYPES) as ProjectType[]).filter(
-			(t) =>
-				PROJECT_TYPES[t].requires.length === 0 ||
-				PROJECT_TYPES[t].requires.every((r) => completedResearch.includes(r))
-		)
+	// All types split into available and locked (by research or hardware)
+	const allTypes = $derived(
+		(Object.keys(PROJECT_TYPES) as ProjectType[]).map((t) => {
+			const researchMet = PROJECT_TYPES[t].requires.every((r) => completedResearch.includes(r));
+			const hardwareMet = laptopTier >= PROJECT_TYPES[t].laptopTierMin;
+			return {
+				type: t,
+				researchMet,
+				hardwareMet,
+				available: researchMet && hardwareMet
+			};
+		})
 	);
+
+	const availableTypes = $derived(allTypes.filter((t) => t.available).map((t) => t.type));
+
+	// Ensure selected type is always in available list
+	$effect(() => {
+		if (!availableTypes.includes(type) && availableTypes.length > 0) {
+			type = availableTypes[0];
+		}
+	});
 
 	const features = $derived(FEATURE_POOLS[type] ?? []);
 
@@ -34,7 +52,7 @@
 				.reduce((s, f) => s + f.wuCost, 0)
 	);
 
-	const estimatedWeeks = $derived(Math.ceil(totalWu / wuPerWeek));
+	const estimatedWeeks = $derived(wu > 0 ? Math.ceil(totalWu / wu) : 0);
 
 	const selectedFeatureRevenue = $derived(
 		features
@@ -56,7 +74,7 @@
 	const hasActiveProject = $derived($game.projects.some((p) => p.status === 'in_development'));
 
 	const canStart = $derived(
-		name.trim().length > 0 && selectedFeatureIds.length > 0 && !hasActiveProject
+		name.trim().length > 0 && selectedFeatureIds.length > 0 && !hasActiveProject && wu > 0
 	);
 
 	function toggleFeature(id: string) {
@@ -80,6 +98,10 @@
 		const range = PRICE_RANGES[type][pricingModel === 'one_time' ? 'oneTime' : 'subscription'];
 		price = Math.round((range[0] + range[1]) / 2);
 	});
+
+	function laptopTierLabel(tier: number): string {
+		return LAPTOP_TIERS[tier as 1 | 2 | 3 | 4]?.name ?? `Tier ${tier}`;
+	}
 
 	function startProject() {
 		if (!canStart) return;
@@ -117,6 +139,9 @@
 					weeksOnMarket: 0,
 					totalRevenue: 0,
 					revenueHistory: [],
+					hostingType: 'none',
+					hostingCostPerWeek: 0,
+					hostingWuDrainPerWeek: 0,
 					weekStarted: s.meta.week,
 					weekShipped: null,
 					techRequired: PROJECT_TYPES[type].requires
@@ -168,18 +193,52 @@
 
 	<!-- Type -->
 	<div>
-		<label for="proj-type" class="mb-2 block text-sm font-medium text-gray-300">
-			Project Type
-		</label>
-		<select
-			id="proj-type"
-			bind:value={type}
-			class="bg-navy-700 border-navy-600 focus:border-neon w-full rounded-xl border px-4 py-3 text-white outline-none transition-colors"
-		>
-			{#each availableTypes as t (t)}
-				<option value={t}>{PROJECT_TYPES[t].label}</option>
+		<div class="mb-2 flex items-center justify-between">
+			<label class="text-sm font-medium text-gray-300">Project Type</label>
+			<div class="bg-navy-700 border-navy-600 flex rounded-lg border p-0.5">
+				<button
+					onclick={() => (showAllTypes = false)}
+					class="rounded px-3 py-1 text-xs font-medium transition-colors"
+					class:bg-neon={!showAllTypes}
+					class:text-navy={!showAllTypes}
+					class:text-gray-400={showAllTypes}
+				>Available</button>
+				<button
+					onclick={() => (showAllTypes = true)}
+					class="rounded px-3 py-1 text-xs font-medium transition-colors"
+					class:bg-neon={showAllTypes}
+					class:text-navy={showAllTypes}
+					class:text-gray-400={!showAllTypes}
+				>All</button>
+			</div>
+		</div>
+		<div class="space-y-2">
+			{#each allTypes.filter(e => showAllTypes || e.available) as entry (entry.type)}
+				{@const typeInfo = PROJECT_TYPES[entry.type]}
+				{@const isSelected = type === entry.type}
+				{@const locked = !entry.available}
+				<button
+					onclick={() => entry.available && (type = entry.type)}
+					disabled={locked}
+					class="w-full rounded-xl border px-4 py-3 text-left text-sm transition-all {isSelected && !locked ? 'border-neon bg-neon/10' : (!isSelected ? 'border-navy-600 bg-navy-700' : 'border-navy-600')} {!locked ? 'text-white' : 'opacity-50 cursor-not-allowed'}"
+				>
+					<div class="flex items-center justify-between">
+						<span class:text-neon={isSelected && !locked} class:font-semibold={isSelected && !locked}>
+							{typeInfo.label}
+						</span>
+						{#if !entry.hardwareMet}
+							<span class="rounded bg-orange-900 px-2 py-0.5 text-xs text-orange-300">
+								Requires: {laptopTierLabel(typeInfo.laptopTierMin)}
+							</span>
+						{:else if !entry.researchMet}
+							<span class="rounded bg-navy-600 px-2 py-0.5 text-xs text-gray-500">
+								🔒 Research required
+							</span>
+						{/if}
+					</div>
+				</button>
 			{/each}
-		</select>
+		</div>
 	</div>
 
 	<!-- Pricing Model -->
@@ -254,8 +313,12 @@
 				<span class="font-mono text-white">{totalWu} WU</span>
 			</div>
 			<div class="flex justify-between text-sm">
+				<span class="text-gray-400">Available WU/wk</span>
+				<span class="font-mono" class:text-neon={wu > 0} class:text-red-400={wu <= 0}>{wu} WU</span>
+			</div>
+			<div class="flex justify-between text-sm">
 				<span class="text-gray-400">Estimated weeks</span>
-				<span class="font-mono text-white">{estimatedWeeks} wk</span>
+				<span class="font-mono text-white">{wu > 0 ? estimatedWeeks : '∞'} wk</span>
 			</div>
 			<div class="flex justify-between text-sm">
 				<span class="text-gray-400">Projected revenue</span>

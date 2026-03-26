@@ -1,20 +1,22 @@
-import type { ProjectFeature, ProjectType } from '$lib/types';
+import type { ProjectFeature, ProjectType, LaptopTier } from '$lib/types';
 
 export const PROJECT_TYPES: Record<
 	ProjectType,
-	{ label: string; baseWu: number; requires: string[] }
+	{ label: string; baseWu: number; requires: string[]; laptopTierMin: LaptopTier }
 > = {
-	browser_ext: { label: 'Browser Extension', baseWu: 10, requires: [] },
-	mobile_app: { label: 'Mobile App', baseWu: 30, requires: ['mobile_dev'] },
-	saas: { label: 'SaaS Tool', baseWu: 40, requires: ['web_basics'] },
-	desktop_app: { label: 'Desktop App', baseWu: 35, requires: ['web_basics'] },
-	ai_product: { label: 'AI Product', baseWu: 60, requires: ['ai_features'] }
+	basic_website: { label: 'Basic Website', baseWu: 8, requires: [], laptopTierMin: 1 },
+	browser_ext: { label: 'Browser Extension', baseWu: 10, requires: [], laptopTierMin: 1 },
+	mobile_app: { label: 'Mobile App', baseWu: 30, requires: ['mobile_dev'], laptopTierMin: 2 },
+	saas: { label: 'SaaS Tool', baseWu: 40, requires: ['web_basics'], laptopTierMin: 2 },
+	desktop_app: { label: 'Desktop App', baseWu: 35, requires: ['web_basics'], laptopTierMin: 2 },
+	ai_product: { label: 'AI Product', baseWu: 60, requires: ['ai_features'], laptopTierMin: 4 }
 };
 
 export const PRICE_RANGES: Record<
 	ProjectType,
 	{ oneTime: [number, number]; subscription: [number, number] }
 > = {
+	basic_website: { oneTime: [1, 10], subscription: [1, 5] },
 	browser_ext: { oneTime: [1, 15], subscription: [1, 5] },
 	mobile_app: { oneTime: [2, 20], subscription: [3, 15] },
 	saas: { oneTime: [50, 500], subscription: [10, 99] },
@@ -22,9 +24,133 @@ export const PRICE_RANGES: Record<
 	ai_product: { oneTime: [20, 200], subscription: [15, 150] }
 };
 
+// Hosting costs per product type (external = $/wk, self = WU/wk)
+export const HOSTING_EXTERNAL_COST: Partial<Record<ProjectType, number>> = {
+	mobile_app: 150,
+	saas: 400,
+	desktop_app: 100,
+	ai_product: 1200
+};
+
+export const HOSTING_WU_DRAIN: Partial<Record<ProjectType, number>> = {
+	mobile_app: 1,
+	saas: 2,
+	desktop_app: 1,
+	ai_product: 4
+};
+
+// Types that need hosting (browser_ext has 'none')
+export const NEEDS_HOSTING: ProjectType[] = ['mobile_app', 'saas', 'desktop_app', 'ai_product'];
+
+// Laptop tier definitions
+export const LAPTOP_TIERS: Record<
+	LaptopTier,
+	{ name: string; wuPerWeek: number; purchasePrice: number; description: string }
+> = {
+	1: { name: 'Old Laptop', wuPerWeek: 5, purchasePrice: 0, description: 'Starting equipment' },
+	2: { name: 'Mid-Range Laptop', wuPerWeek: 7, purchasePrice: 1500, description: 'Decent speed' },
+	3: { name: 'Pro Laptop', wuPerWeek: 10, purchasePrice: 4000, description: 'Professional grade' },
+	4: {
+		name: 'Dev Workstation',
+		wuPerWeek: 14,
+		purchasePrice: 12000,
+		description: 'Peak performance'
+	},
+	5: {
+		name: 'Ultra Workstation',
+		wuPerWeek: 20,
+		purchasePrice: 30000,
+		description: 'Ultra performance'
+	}
+};
+
+// Self-cost tier definitions
+export const SELF_COST_TIERS = {
+	bedroom: {
+		label: 'Bedroom Startup',
+		weeklyCost: 200,
+		emoji: '🛏️',
+		flavour: 'Living with parents, ramen diet'
+	},
+	apartment: {
+		label: 'Solo Apartment',
+		weeklyCost: 600,
+		emoji: '🏠',
+		flavour: 'Your own place, basic setup'
+	},
+	home_office: {
+		label: 'Home Office',
+		weeklyCost: 1200,
+		emoji: '💻',
+		flavour: 'Decent desk, fast internet, coffee machine'
+	},
+	coworking: {
+		label: 'Coworking Space',
+		weeklyCost: 2500,
+		emoji: '☕',
+		flavour: 'Hot desk, networking events, free oat milk'
+	}
+} as const;
+
 type FeatureTemplate = Omit<ProjectFeature, 'status' | 'progressWu'>;
 
 export const FEATURE_POOLS: Record<ProjectType, FeatureTemplate[]> = {
+	basic_website: [
+		{
+			id: 'bw_landing',
+			name: 'Landing Page',
+			description: 'A polished homepage that converts visitors.',
+			wuCost: 3,
+			revenueBoost: 5,
+			qualityBoost: 5,
+			unlockRequires: []
+		},
+		{
+			id: 'bw_contact',
+			name: 'Contact Form',
+			description: 'Let visitors get in touch directly.',
+			wuCost: 2,
+			revenueBoost: 5,
+			qualityBoost: 3,
+			unlockRequires: []
+		},
+		{
+			id: 'bw_blog',
+			name: 'Blog',
+			description: 'Publish articles to drive organic traffic.',
+			wuCost: 4,
+			revenueBoost: 15,
+			qualityBoost: 5,
+			unlockRequires: []
+		},
+		{
+			id: 'bw_seo',
+			name: 'SEO Optimization',
+			description: 'Rank higher in search engines.',
+			wuCost: 3,
+			revenueBoost: 15,
+			qualityBoost: 6,
+			unlockRequires: ['web_basics']
+		},
+		{
+			id: 'bw_dark',
+			name: 'Dark Mode',
+			description: 'A sleek dark theme option.',
+			wuCost: 2,
+			revenueBoost: 2,
+			qualityBoost: 5,
+			unlockRequires: ['ui_ux']
+		},
+		{
+			id: 'bw_analytics',
+			name: 'Analytics',
+			description: 'Track visitor behavior and traffic sources.',
+			wuCost: 3,
+			revenueBoost: 10,
+			qualityBoost: 4,
+			unlockRequires: ['web_basics']
+		}
+	],
 	browser_ext: [
 		{
 			id: 'be_popup_ui',

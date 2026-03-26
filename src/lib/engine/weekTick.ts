@@ -1,9 +1,23 @@
 import type { GameState, Project, ProjectFeature } from '$lib/types';
 import { calcInitialRevenue, calcInitialSubscribers, tickShippedProject } from './pricing';
 import { maybeFireEvent } from './events';
+import { LAPTOP_TIERS, HOSTING_EXTERNAL_COST, HOSTING_WU_DRAIN, NEEDS_HOSTING } from './projects';
 
-function getWuPerWeek(state: GameState): number {
-	return state.research.completed.includes('agile_process') ? 6 : 5;
+function getBaseLaptopWu(state: GameState): number {
+	return LAPTOP_TIERS[state.expenses.laptopTier].wuPerWeek;
+}
+
+function getSelfHostingWuDrain(state: GameState): number {
+	return state.projects
+		.filter((p) => p.status === 'shipped' && p.hostingType === 'self')
+		.reduce((sum, p) => sum + p.hostingWuDrainPerWeek, 0);
+}
+
+function getAvailableWu(state: GameState): number {
+	const base = getBaseLaptopWu(state);
+	const agileBonus = state.research.completed.includes('agile_process') ? 1 : 0;
+	const drain = getSelfHostingWuDrain(state);
+	return base + agileBonus - drain;
 }
 
 function getRpPerWeek(): number {
@@ -55,17 +69,23 @@ function makeNotif(week: number, message: string, type: 'success' | 'warning' | 
 export function advanceWeek(state: GameState): GameState {
 	let s = structuredClone(state) as GameState;
 	const week = s.meta.week;
-	const wu = getWuPerWeek(s);
+	const availableWu = getAvailableWu(s);
 	const rp = getRpPerWeek();
 
 	// 1. Tick active development project
 	const activeProject = s.projects.find((p) => p.status === 'in_development');
-	if (activeProject) {
-		const updated = tickActiveProject(activeProject, wu);
+	let newPendingHostingId: string | null = s.pendingHostingChoiceId;
+
+	if (activeProject && availableWu > 0) {
+		const updated = tickActiveProject(activeProject, availableWu);
 
 		// Check if all features complete → ship!
 		const allComplete = updated.features.every((f) => f.status === 'complete');
 		if (allComplete || updated.progress >= 100) {
+			const needsHosting = NEEDS_HOSTING.includes(updated.type);
+			const externalCost = HOSTING_EXTERNAL_COST[updated.type] ?? 0;
+			const wuDrain = HOSTING_WU_DRAIN[updated.type] ?? 0;
+
 			const shipped = {
 				...updated,
 				status: 'shipped' as const,
@@ -74,9 +94,18 @@ export function advanceWeek(state: GameState): GameState {
 				activeSubscribers: calcInitialSubscribers(updated, s.meta.reputation),
 				revenueDecayRate: s.research.completed.includes('devops') ? 0.25 : 0.5,
 				weeksOnMarket: 0,
-				revenueHistory: []
+				revenueHistory: [],
+				hostingType: needsHosting ? ('external' as const) : ('none' as const),
+				hostingCostPerWeek: needsHosting ? externalCost : 0,
+				hostingWuDrainPerWeek: needsHosting ? wuDrain : 0
 			};
 			s.projects = s.projects.map((p) => (p.id === shipped.id ? shipped : p));
+
+			// Trigger hosting choice modal for products that need hosting
+			if (needsHosting) {
+				newPendingHostingId = shipped.id;
+			}
+
 			s.notifications = [
 				makeNotif(
 					week,
@@ -89,6 +118,8 @@ export function advanceWeek(state: GameState): GameState {
 			s.projects = s.projects.map((p) => (p.id === updated.id ? updated : p));
 		}
 	}
+
+	s.pendingHostingChoiceId = newPendingHostingId;
 
 	// 2. Tick active research
 	if (s.research.inProgress) {
@@ -109,10 +140,38 @@ export function advanceWeek(state: GameState): GameState {
 		}
 	}
 
-	// 3. Revenue from shipped products
+	// 3. Deduct self/living costs
+	const selfCost = s.expenses.weeklySelfCost;
+	s.meta.cash -= selfCost;
+
+	// 4. Deduct external hosting costs + apply outage risk for self-hosted; collect revenue
+	let externalHostingTotal = 0;
 	let weeklyIncome = 0;
+
 	s.projects = s.projects.map((p) => {
 		if (p.status !== 'shipped') return p;
+
+		// Outage check for self-hosted
+		const outageRisk = s.research.completed.includes('devops') ? 0.02 : 0.05;
+		if (p.hostingType === 'self' && Math.random() < outageRisk) {
+			s.notifications = [
+				makeNotif(
+					week,
+					`⚡ "${p.name}" went down — self-hosted server crashed. No revenue this week.`,
+					'danger'
+				),
+				...s.notifications
+			].slice(0, 50);
+			// Return project unchanged (no revenue tick, no WU tick)
+			return p;
+		}
+
+		// External hosting cost
+		if (p.hostingType === 'external') {
+			externalHostingTotal += p.hostingCostPerWeek;
+			s.meta.cash -= p.hostingCostPerWeek;
+		}
+
 		const ticked = tickShippedProject(p);
 		weeklyIncome += ticked.weeklyRevenue;
 		return ticked;
@@ -121,15 +180,41 @@ export function advanceWeek(state: GameState): GameState {
 	s.meta.cash += weeklyIncome;
 	s.meta.totalEarned += weeklyIncome;
 
-	// 4. Advance time
+	// 5. Weekly expense summary notification
+	const netChange = weeklyIncome - selfCost - externalHostingTotal;
+	const sign = netChange >= 0 ? '+' : '';
+	s.notifications = [
+		makeNotif(
+			week,
+			`📊 Week ${week} — Revenue: +$${Math.round(weeklyIncome).toLocaleString()} · Living: -$${selfCost.toLocaleString()} · Hosting: -$${externalHostingTotal.toLocaleString()} · Net: ${sign}$${Math.round(netChange).toLocaleString()}`,
+			netChange >= 0 ? 'info' : 'warning'
+		),
+		...s.notifications
+	].slice(0, 50);
+
+	// 6. WU warning if overloaded
+	if (availableWu <= 0) {
+		s.notifications = [
+			makeNotif(
+				week,
+				`⚠️ No WU available — self-hosting overhead is consuming all your time.`,
+				'danger'
+			),
+			...s.notifications
+		].slice(0, 50);
+	}
+
+	// 7. Advance time
 	s.meta.week = week + 1;
 	if (s.meta.week > 52) {
 		s.meta.week = 1;
 		s.meta.year += 1;
 	}
 
-	// 5. Random events
+	// 8. Random events
 	s = maybeFireEvent(s);
 
 	return s;
 }
+
+export { getAvailableWu, getBaseLaptopWu, getSelfHostingWuDrain };

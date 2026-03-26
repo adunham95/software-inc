@@ -31,13 +31,26 @@
 	}
 
 	function startResearch(id: string) {
+		const node = $game.research.tree.find((n) => n.id === id);
+		if (!node) return;
+
 		game.update((s) => ({
 			...s,
+			meta: { ...s.meta, cash: s.meta.cash - node.upfrontCost },
 			research: {
 				...s.research,
 				inProgress: id,
 				progressWu: 0
-			}
+			},
+			notifications: [
+				{
+					id: crypto.randomUUID(),
+					week: s.meta.week,
+					message: `🔬 Started "${node.name}" research — $${node.upfrontCost.toLocaleString()} paid.`,
+					type: 'info' as const
+				},
+				...s.notifications
+			].slice(0, 50)
 		}));
 		pendingResearchId = null;
 	}
@@ -80,7 +93,8 @@
 			<h3 class="mb-2 text-base font-semibold text-white">Replace Current Research?</h3>
 			<p class="mb-4 text-sm text-gray-400">
 				Switching to <strong class="text-white">{pending?.name}</strong> will reset your current
-				progress on <strong class="text-white">{$activeResearch?.name}</strong>.
+				progress on <strong class="text-white">{$activeResearch?.name}</strong>. You will pay
+				<strong class="text-amber-400">${pending?.upfrontCost.toLocaleString()}</strong> upfront.
 			</p>
 			<div class="flex gap-3">
 				<button
@@ -126,6 +140,7 @@
 				completed={$game.research.completed}
 				inProgress={$game.research.inProgress}
 				progressWu={$game.research.progressWu}
+				cash={$game.meta.cash}
 				onStart={handleStart}
 			/>
 		{/each}
