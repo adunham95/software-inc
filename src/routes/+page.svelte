@@ -32,8 +32,12 @@
 			? $game.projects.find((p) => p.id === $game.pendingHostingChoiceId)
 			: null
 	);
-	const pendingExternalCost = $derived(pendingProject ? (HOSTING_EXTERNAL_COST[pendingProject.type] ?? 0) : 0);
-	const pendingSelfWuDrain = $derived(pendingProject ? (HOSTING_WU_DRAIN[pendingProject.type] ?? 0) : 0);
+	const pendingExternalCost = $derived(
+		pendingProject ? (HOSTING_EXTERNAL_COST[pendingProject.type] ?? 0) : 0
+	);
+	const pendingSelfWuDrain = $derived(
+		pendingProject ? (HOSTING_WU_DRAIN[pendingProject.type] ?? 0) : 0
+	);
 	const wuAfterSelf = $derived($availableWu - pendingSelfWuDrain);
 
 	function chooseHosting(type: 'external' | 'self') {
@@ -48,17 +52,20 @@
 					? { ...p, hostingType: type, hostingCostPerWeek: cost, hostingWuDrainPerWeek: drain }
 					: p
 			),
-			notifications: ([
-				{
-					id: crypto.randomUUID(),
-					week: s.meta.week,
-					message: type === 'external'
-						? `☁️ "${pendingProject.name}" on external hosting — $${cost}/wk.`
-						: `🖥️ "${pendingProject.name}" self-hosted — ${drain} WU/wk drain.`,
-					type: 'info'
-				} satisfies Notification,
-				...s.notifications
-			] as Notification[]).slice(0, 50)
+			notifications: (
+				[
+					{
+						id: crypto.randomUUID(),
+						week: s.meta.week,
+						message:
+							type === 'external'
+								? `☁️ "${pendingProject.name}" on external hosting — $${cost}/wk.`
+								: `🖥️ "${pendingProject.name}" self-hosted — ${drain} WU/wk drain.`,
+						type: 'info'
+					} satisfies Notification,
+					...s.notifications
+				] as Notification[]
+			).slice(0, 50)
 		}));
 	}
 
@@ -81,7 +88,7 @@
 </script>
 
 <!-- Sticky Header -->
-<header class="bg-navy/95 border-navy-600 sticky top-0 z-30 border-b px-4 py-3 backdrop-blur">
+<header class="sticky top-0 z-30 border-b border-navy-600 bg-navy/95 px-4 py-3 backdrop-blur">
 	<div class="flex items-center justify-between">
 		<div>
 			<div class="font-mono text-xs text-gray-500">
@@ -90,12 +97,13 @@
 			<div class="flex items-center gap-2">
 				<span class="text-sm font-semibold text-white">{$game.meta.companyName}</span>
 				<span class="rounded-full bg-navy-700 px-2 py-0.5 font-mono text-xs text-gray-400">
-					{lifestyleTier.emoji} {lifestyleTier.label}
+					{lifestyleTier.emoji}
+					{lifestyleTier.label}
 				</span>
 			</div>
 		</div>
 		<div class="text-right">
-			<div class="text-neon font-mono text-xl font-bold">
+			<div class="font-mono text-xl font-bold text-neon">
 				${$game.meta.cash.toLocaleString(undefined, { maximumFractionDigits: 0 })}
 			</div>
 			<div class="text-xs text-gray-500">cash</div>
@@ -103,8 +111,7 @@
 	</div>
 </header>
 
-<div class="mx-auto max-w-lg px-4 py-4 space-y-6">
-
+<div class="mx-auto max-w-lg space-y-6 px-4 py-4">
 	<!-- Stats Row (4-col) -->
 	<div class="grid grid-cols-4 gap-2">
 		<StatChip
@@ -126,7 +133,7 @@
 
 	<!-- Active Projects + Patch -->
 	<section>
-		<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">
+		<h2 class="mb-3 text-xs font-semibold tracking-widest text-gray-500 uppercase">
 			In Development
 		</h2>
 		<div class="space-y-3">
@@ -138,18 +145,23 @@
 			{#if activePatch && patchProject}
 				<a
 					href="/projects/{patchProject.id}"
-					class="bg-navy-700 border-navy-600 block rounded-xl border p-4 transition-all hover:border-blue-600"
+					class="block rounded-xl border border-navy-600 bg-navy-700 p-4 transition-all hover:border-blue-600"
 				>
 					<div class="mb-2 flex items-center justify-between">
-						<span class="text-sm font-semibold text-blue-300">🩹 Patching "{patchProject.name}"</span>
+						<span class="text-sm font-semibold text-blue-300"
+							>🩹 Patching "{patchProject.name}"</span
+						>
 						<span class="font-mono text-xs text-gray-400">
 							{activePatch.wuInvested}/{activePatch.wuRequired} WU
 						</span>
 					</div>
-					<div class="bg-navy-600 mb-1 h-1.5 w-full overflow-hidden rounded-full">
+					<div class="mb-1 h-1.5 w-full overflow-hidden rounded-full bg-navy-600">
 						<div
 							class="h-full rounded-full bg-blue-500 transition-all"
-							style="width: {Math.min(100, (activePatch.wuInvested / activePatch.wuRequired) * 100)}%"
+							style="width: {Math.min(
+								100,
+								(activePatch.wuInvested / activePatch.wuRequired) * 100
+							)}%"
 						></div>
 					</div>
 					<div class="text-xs text-gray-500">
@@ -161,19 +173,21 @@
 			{#if !inDevProjects.length && !activePatch}
 				<a
 					href="/projects/new"
-					class="bg-navy-700 hover:border-neon/50 flex items-center justify-center rounded-xl border border-dashed border-gray-600 p-4 text-sm text-gray-400 transition-all hover:text-gray-200"
+					class="flex items-center justify-center rounded-xl border border-dashed border-gray-600 bg-navy-700 p-4 text-sm text-gray-400 transition-all hover:border-neon/50 hover:text-gray-200"
 				>
 					+ New Project
 				</a>
 			{:else if !inDevProjects.length && activePatch}
 				<!-- Show new project link disabled while patch is active -->
-				<div class="flex items-center justify-center rounded-xl border border-dashed border-gray-700 p-4 text-sm text-gray-600">
+				<div
+					class="flex items-center justify-center rounded-xl border border-dashed border-gray-700 p-4 text-sm text-gray-600"
+				>
 					Complete patch to start a new project
 				</div>
 			{:else}
 				<a
 					href="/projects/new"
-					class="bg-navy-700 hover:border-neon/50 flex items-center justify-center rounded-xl border border-dashed border-gray-600 p-4 text-sm text-gray-400 transition-all hover:text-gray-200"
+					class="flex items-center justify-center rounded-xl border border-dashed border-gray-600 bg-navy-700 p-4 text-sm text-gray-400 transition-all hover:border-neon/50 hover:text-gray-200"
 				>
 					+ New Project
 				</a>
@@ -184,7 +198,7 @@
 	<!-- Live Products -->
 	{#if liveProjects.length > 0}
 		<section>
-			<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">
+			<h2 class="mb-3 text-xs font-semibold tracking-widest text-gray-500 uppercase">
 				Shipped Products
 			</h2>
 			<div class="space-y-3">
@@ -198,7 +212,7 @@
 	<!-- Dead Products -->
 	{#if deadProjects.length > 0}
 		<section>
-			<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">
+			<h2 class="mb-3 text-xs font-semibold tracking-widest text-gray-500 uppercase">
 				Dead Products
 			</h2>
 			<div class="space-y-3">
@@ -211,13 +225,16 @@
 							<div class="flex items-center gap-2">
 								<span class="text-sm font-semibold text-gray-400">{project.name}</span>
 								<span class="rounded bg-gray-800 px-1.5 py-0.5 text-xs text-gray-500">💀 DEAD</span>
-								<span class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-gray-600">v{project.version}</span>
+								<span class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-gray-600"
+									>v{project.version}</span
+								>
 							</div>
 							<span class="text-xs text-gray-600">→</span>
 						</div>
 						<div class="mt-1 text-xs text-gray-600">
-							{project.bugs.filter((b) => !b.fixed).length} unfixed bugs ·
-							${Math.round(project.totalRevenue).toLocaleString()} lifetime
+							{project.bugs.filter((b) => !b.fixed).length} unfixed bugs · ${Math.round(
+								project.totalRevenue
+							).toLocaleString()} lifetime
 						</div>
 					</a>
 				{/each}
@@ -228,26 +245,29 @@
 	<!-- Research -->
 	<section>
 		<div class="mb-3 flex items-center justify-between">
-			<h2 class="text-xs font-semibold uppercase tracking-widest text-gray-500">Research</h2>
-			<a href="/research" class="text-neon text-xs">View Tree →</a>
+			<h2 class="text-xs font-semibold tracking-widest text-gray-500 uppercase">Research</h2>
+			<a href="/research" class="text-xs text-neon">View Tree →</a>
 		</div>
 		{#if $activeResearch}
-			<div class="bg-navy-700 rounded-xl p-4">
+			<div class="rounded-xl bg-navy-700 p-4">
 				<div class="mb-2 flex items-center justify-between">
 					<span class="text-sm font-medium text-white">{$activeResearch.name}</span>
 					<span class="font-mono text-xs text-gray-400">{$researchWeeksRemaining}wk left</span>
 				</div>
-				<div class="bg-navy-600 h-2 w-full overflow-hidden rounded-full">
+				<div class="h-2 w-full overflow-hidden rounded-full bg-navy-600">
 					<div
-						class="bg-neon h-full rounded-full transition-all"
-						style="width: {Math.min(100, ($game.research.progressWu / ($activeResearch.weeksToComplete * 2)) * 100)}%"
+						class="h-full rounded-full bg-neon transition-all"
+						style="width: {Math.min(
+							100,
+							($game.research.progressWu / ($activeResearch.weeksToComplete * 2)) * 100
+						)}%"
 					></div>
 				</div>
 			</div>
 		{:else}
 			<a
 				href="/research"
-				class="bg-navy-700 hover:border-neon/50 flex items-center justify-center rounded-xl border border-dashed border-gray-600 p-4 text-sm text-gray-400 transition-all hover:text-gray-200"
+				class="flex items-center justify-center rounded-xl border border-dashed border-gray-600 bg-navy-700 p-4 text-sm text-gray-400 transition-all hover:border-neon/50 hover:text-gray-200"
 			>
 				Start Research →
 			</a>
@@ -259,7 +279,7 @@
 		<section>
 			<button
 				onclick={() => (showArchivedSection = !showArchivedSection)}
-				class="mb-3 flex w-full items-center justify-between text-xs font-semibold uppercase tracking-widest text-gray-600 hover:text-gray-400 transition-colors"
+				class="mb-3 flex w-full items-center justify-between text-xs font-semibold tracking-widest text-gray-600 uppercase transition-colors hover:text-gray-400"
 			>
 				<span>Archived ({$archivedProjects.length})</span>
 				<span>{showArchivedSection ? '▲' : '▼'}</span>
@@ -276,7 +296,9 @@
 									<span class="text-gray-500">📦 {project.name}</span>
 									<span class="font-mono text-xs text-gray-700">v{project.version}</span>
 								</div>
-								<span class="font-mono text-xs text-gray-600">${Math.round(project.totalRevenue).toLocaleString()} total</span>
+								<span class="font-mono text-xs text-gray-600"
+									>${Math.round(project.totalRevenue).toLocaleString()} total</span
+								>
 							</div>
 						</a>
 					{/each}
@@ -288,9 +310,7 @@
 	<!-- Notifications -->
 	{#if $game.notifications.length > 0}
 		<section>
-			<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">
-				Events
-			</h2>
+			<h2 class="mb-3 text-xs font-semibold tracking-widest text-gray-500 uppercase">Events</h2>
 			<NotificationLog notifications={$game.notifications} />
 		</section>
 	{/if}
@@ -299,24 +319,27 @@
 	<section class="pb-4 text-center">
 		<button
 			onclick={handleReset}
-			class="text-xs text-gray-600 hover:text-red-400 transition-colors"
+			class="text-xs text-gray-600 transition-colors hover:text-red-400"
 		>
 			{showReset ? '⚠️ Tap again to reset save' : 'Reset Game'}
 		</button>
 	</section>
-
 </div>
 
 <!-- Hosting Choice Modal -->
 {#if pendingProject}
-	<div class="fixed inset-0 z-50 flex items-end bg-black/70 pb-8">
-		<div class="bg-navy-800 border-navy-600 mx-4 w-full max-w-lg rounded-2xl border p-6">
-			<h3 class="mb-1 text-base font-semibold text-white">Where will you host "{pendingProject.name}"?</h3>
-			<p class="mb-4 text-xs text-gray-400">Choose your hosting strategy. You can switch later from the project page.</p>
+	<div class="fixed inset-0 z-50 flex items-end bg-black/70 pb-[70px]">
+		<div class="mx-4 w-full max-w-lg rounded-2xl border border-navy-600 bg-navy-800 p-6">
+			<h3 class="mb-1 text-base font-semibold text-white">
+				Where will you host "{pendingProject.name}"?
+			</h3>
+			<p class="mb-4 text-xs text-gray-400">
+				Choose your hosting strategy. You can switch later from the project page.
+			</p>
 			<div class="space-y-3">
 				<button
 					onclick={() => chooseHosting('external')}
-					class="border-navy-600 hover:border-neon w-full rounded-xl border p-4 text-left transition-all"
+					class="w-full rounded-xl border border-navy-600 p-4 text-left transition-all hover:border-neon"
 				>
 					<div class="flex items-center justify-between">
 						<span class="font-medium text-white">☁️ External Hosting</span>
@@ -326,7 +349,7 @@
 				</button>
 				<button
 					onclick={() => chooseHosting('self')}
-					class="border-navy-600 hover:border-neon w-full rounded-xl border p-4 text-left transition-all"
+					class="w-full rounded-xl border border-navy-600 p-4 text-left transition-all hover:border-neon"
 				>
 					<div class="flex items-center justify-between">
 						<span class="font-medium text-white">🖥️ Self-Hosted</span>

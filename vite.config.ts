@@ -2,4 +2,4 @@ import tailwindcss from '@tailwindcss/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
-export default defineConfig({ server: { port: 3773 }, plugins: [tailwindcss(), sveltekit()] });
+export default defineConfig({ server: { port: 3113 }, plugins: [tailwindcss(), sveltekit()] });

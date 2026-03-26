@@ -24,18 +24,13 @@
 	const weeksRemaining = $derived(
 		project && project.status === 'in_development'
 			? Math.ceil(
-					(project.features.reduce((s, f) => s + (f.wuCost - f.progressWu), 0)) /
-						$availableWu
+					project.features.reduce((s, f) => s + (f.wuCost - f.progressWu), 0) / $availableWu
 				)
 			: 0
 	);
 
-	const externalCost = $derived(
-		project ? (HOSTING_EXTERNAL_COST[project.type] ?? 0) : 0
-	);
-	const selfWuDrain = $derived(
-		project ? (HOSTING_WU_DRAIN[project.type] ?? 0) : 0
-	);
+	const externalCost = $derived(project ? (HOSTING_EXTERNAL_COST[project.type] ?? 0) : 0);
+	const selfWuDrain = $derived(project ? (HOSTING_WU_DRAIN[project.type] ?? 0) : 0);
 	const wuAfterSwitch = $derived($availableWu - selfWuDrain);
 
 	// Bug helpers
@@ -65,9 +60,7 @@
 			return sum + (bug.severity === 'critical' ? 10 : bug.severity === 'major' ? 5 : 2);
 		}, 0)
 	);
-	const patchWeeksEstimate = $derived(
-		$availableWu > 0 ? Math.ceil(patchWuCost / $availableWu) : 0
-	);
+	const patchWeeksEstimate = $derived($availableWu > 0 ? Math.ceil(patchWuCost / $availableWu) : 0);
 
 	const activePatch = $derived(
 		$game.activePatchJob?.projectId === id ? $game.activePatchJob : null
@@ -76,9 +69,7 @@
 	const hasMajorReleaseInDev = $derived(
 		$game.projects.some((p) => p.isMajorRelease && p.status === 'in_development')
 	);
-	const canPlanMajorRelease = $derived(
-		!hasMajorReleaseInDev && $game.activePatchJob === null
-	);
+	const canPlanMajorRelease = $derived(!hasMajorReleaseInDev && $game.activePatchJob === null);
 
 	function togglePatchBug(bugId: string) {
 		if (patchSelectedBugIds.includes(bugId)) {
@@ -99,15 +90,17 @@
 				bugIdsToFix: [...patchSelectedBugIds],
 				weekStarted: s.meta.week
 			},
-			notifications: ([
-				{
-					id: crypto.randomUUID(),
-					week: s.meta.week,
-					message: `🩹 Patch started for "${project.name}" — fixing ${patchSelectedBugIds.length} bug(s).`,
-					type: 'info'
-				} satisfies Notification,
-				...s.notifications
-			] as Notification[]).slice(0, 50)
+			notifications: (
+				[
+					{
+						id: crypto.randomUUID(),
+						week: s.meta.week,
+						message: `🩹 Patch started for "${project.name}" — fixing ${patchSelectedBugIds.length} bug(s).`,
+						type: 'info'
+					} satisfies Notification,
+					...s.notifications
+				] as Notification[]
+			).slice(0, 50)
 		}));
 		showPatchModal = false;
 		patchSelectedBugIds = [];
@@ -117,15 +110,17 @@
 		game.update((s) => ({
 			...s,
 			activePatchJob: null,
-			notifications: ([
-				{
-					id: crypto.randomUUID(),
-					week: s.meta.week,
-					message: `❌ Patch cancelled for "${project?.name}". WU invested is lost.`,
-					type: 'warning'
-				} satisfies Notification,
-				...s.notifications
-			] as Notification[]).slice(0, 50)
+			notifications: (
+				[
+					{
+						id: crypto.randomUUID(),
+						week: s.meta.week,
+						message: `❌ Patch cancelled for "${project?.name}". WU invested is lost.`,
+						type: 'warning'
+					} satisfies Notification,
+					...s.notifications
+				] as Notification[]
+			).slice(0, 50)
 		}));
 	}
 
@@ -133,18 +128,18 @@
 		if (!project) return;
 		game.update((s) => ({
 			...s,
-			projects: s.projects.map((p) =>
-				p.id === id ? { ...p, status: 'cancelled' } : p
-			),
-			notifications: ([
-				{
-					id: crypto.randomUUID(),
-					week: s.meta.week,
-					message: `❌ "${project.name}" cancelled.`,
-					type: 'warning'
-				} satisfies Notification,
-				...s.notifications
-			] as Notification[]).slice(0, 50)
+			projects: s.projects.map((p) => (p.id === id ? { ...p, status: 'cancelled' } : p)),
+			notifications: (
+				[
+					{
+						id: crypto.randomUUID(),
+						week: s.meta.week,
+						message: `❌ "${project.name}" cancelled.`,
+						type: 'warning'
+					} satisfies Notification,
+					...s.notifications
+				] as Notification[]
+			).slice(0, 50)
 		}));
 		goto('/');
 	}
@@ -157,20 +152,28 @@
 			...s,
 			projects: s.projects.map((p) =>
 				p.id === id
-					? { ...p, hostingType: newType, hostingCostPerWeek: newCost, hostingWuDrainPerWeek: newDrain }
+					? {
+							...p,
+							hostingType: newType,
+							hostingCostPerWeek: newCost,
+							hostingWuDrainPerWeek: newDrain
+						}
 					: p
 			),
-			notifications: ([
-				{
-					id: crypto.randomUUID(),
-					week: s.meta.week,
-					message: newType === 'external'
-						? `☁️ "${project.name}" switched to external hosting — $${newCost}/wk.`
-						: `🖥️ "${project.name}" switched to self-hosting — ${newDrain} WU/wk drain.`,
-					type: 'info'
-				} satisfies Notification,
-				...s.notifications
-			] as Notification[]).slice(0, 50)
+			notifications: (
+				[
+					{
+						id: crypto.randomUUID(),
+						week: s.meta.week,
+						message:
+							newType === 'external'
+								? `☁️ "${project.name}" switched to external hosting — $${newCost}/wk.`
+								: `🖥️ "${project.name}" switched to self-hosting — ${newDrain} WU/wk drain.`,
+						type: 'info'
+					} satisfies Notification,
+					...s.notifications
+				] as Notification[]
+			).slice(0, 50)
 		}));
 		showHostingSwitch = false;
 	}
@@ -188,16 +191,18 @@
 	}
 </script>
 
-<header class="bg-navy/95 border-navy-600 sticky top-0 z-30 border-b px-4 py-3 backdrop-blur">
+<header class="sticky top-0 z-30 border-b border-navy-600 bg-navy/95 px-4 py-3 backdrop-blur">
 	<div class="flex items-center gap-3">
 		<a href="/" class="text-gray-400 hover:text-white">←</a>
 		<div class="flex-1">
 			{#if project}
 				<div class="flex items-center gap-2">
 					<span class="font-semibold text-white">{project.name}</span>
-					<span class="bg-navy-600 rounded px-2 py-0.5 text-xs text-gray-400">{typeLabel}</span>
+					<span class="rounded bg-navy-600 px-2 py-0.5 text-xs text-gray-400">{typeLabel}</span>
 					{#if project.version}
-						<span class="rounded bg-blue-900 px-2 py-0.5 text-xs text-blue-300">v{project.version}</span>
+						<span class="rounded bg-blue-900 px-2 py-0.5 text-xs text-blue-300"
+							>v{project.version}</span
+						>
 					{/if}
 				</div>
 			{:else}
@@ -208,13 +213,11 @@
 </header>
 
 <div class="mx-auto max-w-lg space-y-6 px-4 py-6">
-
 	{#if !project}
 		<div class="rounded-xl border border-red-700 bg-red-950 p-6 text-center text-red-300">
 			Project not found.
 			<a href="/" class="mt-2 block text-sm underline">← Back to Dashboard</a>
 		</div>
-
 	{:else if project.status === 'in_development'}
 		<!-- Status Badge -->
 		<div class="flex items-center gap-2">
@@ -224,27 +227,29 @@
 		</div>
 
 		<!-- Progress -->
-		<div class="bg-navy-700 rounded-xl p-4">
+		<div class="rounded-xl bg-navy-700 p-4">
 			<div class="mb-1 flex items-center justify-between text-sm">
 				<span class="text-gray-400">Overall Progress</span>
 				<span class="font-mono text-white">{Math.round(project.progress)}%</span>
 			</div>
-			<div class="bg-navy-600 mb-3 h-3 w-full overflow-hidden rounded-full">
+			<div class="mb-3 h-3 w-full overflow-hidden rounded-full bg-navy-600">
 				<div
-					class="bg-neon h-full rounded-full transition-all"
+					class="h-full rounded-full bg-neon transition-all"
 					style="width: {project.progress}%"
 				></div>
 			</div>
 			<div class="flex justify-between text-xs text-gray-500">
-				<span>{project.features.reduce((s, f) => s + f.progressWu, 0)} / {project.totalWuRequired} WU</span>
+				<span
+					>{project.features.reduce((s, f) => s + f.progressWu, 0)} / {project.totalWuRequired} WU</span
+				>
 				<span>~{weeksRemaining} weeks remaining</span>
 			</div>
 		</div>
 
 		<!-- Current Feature -->
 		{#if currentFeature}
-			<div class="bg-navy-700 rounded-xl p-4">
-				<div class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-500">
+			<div class="rounded-xl bg-navy-700 p-4">
+				<div class="mb-2 text-xs font-semibold tracking-widest text-gray-500 uppercase">
 					Current Feature
 				</div>
 				<div class="mb-1 flex items-center justify-between text-sm">
@@ -253,9 +258,9 @@
 						{currentFeature.progressWu}/{currentFeature.wuCost} WU
 					</span>
 				</div>
-				<div class="bg-navy-600 h-2 w-full overflow-hidden rounded-full">
+				<div class="h-2 w-full overflow-hidden rounded-full bg-navy-600">
 					<div
-						class="bg-neon h-full rounded-full transition-all"
+						class="h-full rounded-full bg-neon transition-all"
 						style="width: {(currentFeature.progressWu / currentFeature.wuCost) * 100}%"
 					></div>
 				</div>
@@ -263,14 +268,14 @@
 		{/if}
 
 		<!-- Feature List -->
-		<div class="bg-navy-700 rounded-xl p-4">
-			<div class="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">Features</div>
+		<div class="rounded-xl bg-navy-700 p-4">
+			<div class="mb-3 text-xs font-semibold tracking-widest text-gray-500 uppercase">Features</div>
 			<FeatureProgress features={project.features} />
 		</div>
 
 		<!-- Info -->
-		<div class="bg-navy-700 rounded-xl p-4">
-			<div class="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">Info</div>
+		<div class="rounded-xl bg-navy-700 p-4">
+			<div class="mb-3 text-xs font-semibold tracking-widest text-gray-500 uppercase">Info</div>
 			<div class="space-y-2 text-sm">
 				<div class="flex justify-between">
 					<span class="text-gray-400">Quality Score</span>
@@ -315,7 +320,6 @@
 				</button>
 			{/if}
 		</div>
-
 	{:else if project.status === 'shipped' || project.status === 'dead'}
 		<!-- Status Badge -->
 		<div class="flex items-center gap-2">
@@ -340,19 +344,20 @@
 						{activePatch.wuInvested} / {activePatch.wuRequired} WU
 					</span>
 				</div>
-				<div class="bg-navy-600 mb-3 h-2 w-full overflow-hidden rounded-full">
+				<div class="mb-3 h-2 w-full overflow-hidden rounded-full bg-navy-600">
 					<div
 						class="h-full rounded-full bg-blue-500 transition-all"
 						style="width: {Math.min(100, (activePatch.wuInvested / activePatch.wuRequired) * 100)}%"
 					></div>
 				</div>
 				<div class="mb-3 text-xs text-gray-400">
-					Fixing {activePatch.bugIdsToFix.length} bug(s) ·
-					~{$availableWu > 0 ? Math.ceil((activePatch.wuRequired - activePatch.wuInvested) / $availableWu) : '?'} weeks remaining
+					Fixing {activePatch.bugIdsToFix.length} bug(s) · ~{$availableWu > 0
+						? Math.ceil((activePatch.wuRequired - activePatch.wuInvested) / $availableWu)
+						: '?'} weeks remaining
 				</div>
 				<button
 					onclick={cancelPatch}
-					class="text-xs text-red-400 hover:text-red-300 transition-colors"
+					class="text-xs text-red-400 transition-colors hover:text-red-300"
 				>
 					Cancel Patch (WU lost)
 				</button>
@@ -361,21 +366,27 @@
 
 		<!-- Revenue -->
 		{#if project.status === 'shipped'}
-			<div class="bg-navy-700 rounded-xl p-4">
-				<div class="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">Revenue</div>
+			<div class="rounded-xl bg-navy-700 p-4">
+				<div class="mb-3 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+					Revenue
+				</div>
 				<div class="mb-1 flex items-baseline gap-1">
-					<span class="text-neon font-mono text-3xl font-bold">
+					<span class="font-mono text-3xl font-bold text-neon">
 						${Math.round(project.weeklyRevenue).toLocaleString()}
 					</span>
 					<span class="text-gray-400">/wk</span>
 					{#if project.adRevenue > 0}
-						<span class="ml-1 text-sm text-amber-400">+ ${Math.round(project.adRevenue).toLocaleString()} ads</span>
+						<span class="ml-1 text-sm text-amber-400"
+							>+ ${Math.round(project.adRevenue).toLocaleString()} ads</span
+						>
 					{/if}
 				</div>
 				<div class="space-y-2 text-sm">
 					<div class="flex justify-between">
 						<span class="text-gray-400">Lifetime Revenue</span>
-						<span class="font-mono text-white">${Math.round(project.totalRevenue).toLocaleString()}</span>
+						<span class="font-mono text-white"
+							>${Math.round(project.totalRevenue).toLocaleString()}</span
+						>
 					</div>
 					<div class="flex justify-between">
 						<span class="text-gray-400">Pricing</span>
@@ -407,21 +418,25 @@
 		{:else}
 			<div class="rounded-xl border border-gray-700 bg-gray-900 p-4">
 				<div class="mb-1 text-sm font-semibold text-gray-400">Revenue halted — product is dead</div>
-				<div class="text-xs text-gray-600">Fix all critical/major bugs to revive it, or plan a major release.</div>
+				<div class="text-xs text-gray-600">
+					Fix all critical/major bugs to revive it, or plan a major release.
+				</div>
 				<div class="mt-2 text-xs text-gray-500">
-					Lifetime Revenue: <span class="font-mono text-gray-400">${Math.round(project.totalRevenue).toLocaleString()}</span>
+					Lifetime Revenue: <span class="font-mono text-gray-400"
+						>${Math.round(project.totalRevenue).toLocaleString()}</span
+					>
 				</div>
 			</div>
 		{/if}
 
 		<!-- Hosting -->
 		{#if project.hostingType !== 'none' && project.status === 'shipped'}
-			<div class="bg-navy-700 rounded-xl p-4">
+			<div class="rounded-xl bg-navy-700 p-4">
 				<div class="mb-3 flex items-center justify-between">
-					<div class="text-xs font-semibold uppercase tracking-widest text-gray-500">Hosting</div>
+					<div class="text-xs font-semibold tracking-widest text-gray-500 uppercase">Hosting</div>
 					<button
 						onclick={() => (showHostingSwitch = !showHostingSwitch)}
-						class="text-xs text-gray-400 hover:text-white transition-colors"
+						class="text-xs text-gray-400 transition-colors hover:text-white"
 					>
 						Switch →
 					</button>
@@ -464,7 +479,9 @@
 							class:opacity-50={project.hostingType === 'self'}
 						>
 							<div class="font-medium text-white">🖥️ Self-Hosted</div>
-							<div class="text-xs text-orange-400">{selfWuDrain} WU/wk drain · leaves you {wuAfterSwitch} WU for dev</div>
+							<div class="text-xs text-orange-400">
+								{selfWuDrain} WU/wk drain · leaves you {wuAfterSwitch} WU for dev
+							</div>
 						</button>
 					</div>
 				{/if}
@@ -473,8 +490,8 @@
 
 		<!-- Revenue Chart -->
 		{#if project.revenueHistory.length > 0 && project.status === 'shipped'}
-			<div class="bg-navy-700 rounded-xl p-4">
-				<div class="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">
+			<div class="rounded-xl bg-navy-700 p-4">
+				<div class="mb-3 text-xs font-semibold tracking-widest text-gray-500 uppercase">
 					Revenue History (last 8 weeks)
 				</div>
 				<RevenueChart history={project.revenueHistory} />
@@ -482,9 +499,9 @@
 		{/if}
 
 		<!-- Bug Report -->
-		<div class="bg-navy-700 rounded-xl p-4">
+		<div class="rounded-xl bg-navy-700 p-4">
 			<div class="mb-3 flex items-center justify-between">
-				<div class="text-xs font-semibold uppercase tracking-widest text-gray-500">Bug Report</div>
+				<div class="text-xs font-semibold tracking-widest text-gray-500 uppercase">Bug Report</div>
 				{#if unfixedBugs.length > 0}
 					<span class="font-mono text-xs text-red-400">{unfixedBugs.length} unfixed</span>
 				{/if}
@@ -496,18 +513,32 @@
 				<!-- Escalation stage -->
 				{@const stage = escalationStage}
 				{#if stage >= 3}
-					<div class="mb-3 rounded-lg bg-red-950 px-3 py-2 text-xs font-semibold text-red-400">💀 STAGE 3 — Product Dead</div>
+					<div class="mb-3 rounded-lg bg-red-950 px-3 py-2 text-xs font-semibold text-red-400">
+						💀 STAGE 3 — Product Dead
+					</div>
 				{:else if stage >= 2}
-					<div class="mb-3 rounded-lg bg-red-900/40 px-3 py-2 text-xs font-semibold text-red-300">🔴 STAGE 2 — Reputation Damage</div>
+					<div class="mb-3 rounded-lg bg-red-900/40 px-3 py-2 text-xs font-semibold text-red-300">
+						🔴 STAGE 2 — Reputation Damage
+					</div>
 				{:else if stage >= 1}
-					<div class="mb-3 rounded-lg bg-yellow-950 px-3 py-2 text-xs font-semibold text-yellow-400">⚠️ STAGE 1 — Users Grumbling</div>
+					<div
+						class="mb-3 rounded-lg bg-yellow-950 px-3 py-2 text-xs font-semibold text-yellow-400"
+					>
+						⚠️ STAGE 1 — Users Grumbling
+					</div>
 				{/if}
 
 				<!-- Bug count summary -->
 				<div class="mb-3 flex gap-3 text-xs">
-					{#if criticalCount > 0}<span class="rounded bg-red-900 px-2 py-0.5 text-red-300">{criticalCount} critical</span>{/if}
-					{#if majorCount > 0}<span class="rounded bg-orange-900 px-2 py-0.5 text-orange-300">{majorCount} major</span>{/if}
-					{#if minorCount > 0}<span class="rounded bg-yellow-900 px-2 py-0.5 text-yellow-300">{minorCount} minor</span>{/if}
+					{#if criticalCount > 0}<span class="rounded bg-red-900 px-2 py-0.5 text-red-300"
+							>{criticalCount} critical</span
+						>{/if}
+					{#if majorCount > 0}<span class="rounded bg-orange-900 px-2 py-0.5 text-orange-300"
+							>{majorCount} major</span
+						>{/if}
+					{#if minorCount > 0}<span class="rounded bg-yellow-900 px-2 py-0.5 text-yellow-300"
+							>{minorCount} minor</span
+						>{/if}
 				</div>
 
 				<!-- Bug list -->
@@ -515,7 +546,9 @@
 					{#each unfixedBugs as bug (bug.id)}
 						<div class="flex items-start justify-between gap-2 rounded-lg bg-navy-600 px-3 py-2">
 							<div class="flex-1">
-								<span class="mr-2 rounded px-1.5 py-0.5 text-xs {severityColor(bug.severity)}">{bug.severity}</span>
+								<span class="mr-2 rounded px-1.5 py-0.5 text-xs {severityColor(bug.severity)}"
+									>{bug.severity}</span
+								>
 								<span class="text-sm text-gray-300">{bug.description}</span>
 							</div>
 							<span class="shrink-0 font-mono text-xs text-red-400">-${bug.revenueImpact}/wk</span>
@@ -526,21 +559,26 @@
 				<!-- Release patch button -->
 				{#if !activePatch && !$game.activePatchJob}
 					<button
-						onclick={() => { showPatchModal = true; patchSelectedBugIds = []; }}
-						class="bg-neon text-white w-full rounded-xl py-2.5 text-sm font-semibold"
+						onclick={() => {
+							showPatchModal = true;
+							patchSelectedBugIds = [];
+						}}
+						class="w-full rounded-xl bg-neon py-2.5 text-sm font-semibold text-white"
 					>
 						🩹 Release Patch →
 					</button>
 				{:else if $game.activePatchJob && $game.activePatchJob.projectId !== id}
-					<p class="text-xs text-gray-500">A patch is active on another product. Complete it first.</p>
+					<p class="text-xs text-gray-500">
+						A patch is active on another product. Complete it first.
+					</p>
 				{/if}
 			{/if}
 		</div>
 
 		<!-- Features -->
-		<div class="bg-navy-700 rounded-xl p-4">
+		<div class="rounded-xl bg-navy-700 p-4">
 			<div class="mb-2 flex items-center justify-between">
-				<div class="text-xs font-semibold uppercase tracking-widest text-gray-500">Features</div>
+				<div class="text-xs font-semibold tracking-widest text-gray-500 uppercase">Features</div>
 				<span class="font-mono text-sm text-white">Quality: {project.quality}/100</span>
 			</div>
 			<div class="space-y-1">
@@ -559,12 +597,16 @@
 		</div>
 
 		<!-- Major Release -->
-		<div class="bg-navy-700 rounded-xl p-4">
-			<div class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-500">Major Release</div>
+		<div class="rounded-xl bg-navy-700 p-4">
+			<div class="mb-2 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+				Major Release
+			</div>
 			{#if hasMajorReleaseInDev}
 				<p class="text-xs text-gray-500">A major release is already in development.</p>
 			{:else if $game.activePatchJob !== null}
-				<p class="text-xs text-gray-500">Complete the active patch before planning a major release.</p>
+				<p class="text-xs text-gray-500">
+					Complete the active patch before planning a major release.
+				</p>
 			{:else}
 				<a
 					href="/projects/new?majorFrom={project.id}"
@@ -574,21 +616,28 @@
 				</a>
 			{/if}
 		</div>
-
 	{:else if project.status === 'archived'}
 		<div class="rounded-xl border border-gray-700 bg-gray-950 p-6 text-center text-gray-500">
 			<div class="mb-1 text-2xl">📦</div>
-			<div class="mb-1 text-sm font-semibold text-gray-400">Archived — superseded by a newer version</div>
-			<div class="text-xs">Lifetime Revenue: ${Math.round(project.totalRevenue).toLocaleString()}</div>
+			<div class="mb-1 text-sm font-semibold text-gray-400">
+				Archived — superseded by a newer version
+			</div>
+			<div class="text-xs">
+				Lifetime Revenue: ${Math.round(project.totalRevenue).toLocaleString()}
+			</div>
 		</div>
 
 		<!-- Major Release from archived product -->
-		<div class="bg-navy-700 rounded-xl p-4">
-			<div class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-500">Major Release</div>
+		<div class="rounded-xl bg-navy-700 p-4">
+			<div class="mb-2 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+				Major Release
+			</div>
 			{#if hasMajorReleaseInDev}
 				<p class="text-xs text-gray-500">A major release is already in development.</p>
 			{:else if $game.activePatchJob !== null}
-				<p class="text-xs text-gray-500">Complete the active patch before planning a major release.</p>
+				<p class="text-xs text-gray-500">
+					Complete the active patch before planning a major release.
+				</p>
 			{:else}
 				<a
 					href="/projects/new?majorFrom={project.id}"
@@ -598,31 +647,37 @@
 				</a>
 			{/if}
 		</div>
-
 	{:else}
 		<div class="rounded-xl border border-gray-700 bg-gray-950 p-6 text-center text-gray-500">
 			This project was cancelled.
 		</div>
 	{/if}
-
 </div>
 
 <!-- Patch Modal -->
 {#if showPatchModal && project}
-	<div class="fixed inset-0 z-50 flex items-end bg-black/70 pb-8">
-		<div class="bg-navy-800 border-navy-600 mx-4 w-full max-w-lg rounded-2xl border p-6">
+	<div class="fixed inset-0 z-50 flex items-end bg-black/70 pb-[75px]">
+		<div class="mx-4 w-full max-w-lg rounded-2xl border border-navy-600 bg-navy-800 p-6">
 			<h3 class="mb-1 text-base font-semibold text-white">Release Patch for "{project.name}"</h3>
-			<p class="mb-4 text-xs text-gray-400">Select bugs to fix. WU is consumed from your weekly budget.</p>
+			<p class="mb-4 text-xs text-gray-400">
+				Select bugs to fix. WU is consumed from your weekly budget.
+			</p>
 
 			<div class="mb-4 max-h-64 space-y-2 overflow-y-auto">
 				{#each unfixedBugs as bug (bug.id)}
 					<button
 						onclick={() => togglePatchBug(bug.id)}
-						class="w-full rounded-xl border px-4 py-3 text-left transition-all {patchSelectedBugIds.includes(bug.id) ? 'border-neon bg-neon/10' : 'border-gray-600'}"
+						class="w-full rounded-xl border px-4 py-3 text-left transition-all {patchSelectedBugIds.includes(
+							bug.id
+						)
+							? 'border-neon bg-neon/10'
+							: 'border-gray-600'}"
 					>
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2">
-								<span class="text-xs {severityColor(bug.severity)} rounded px-1.5 py-0.5">{bug.severity}</span>
+								<span class="text-xs {severityColor(bug.severity)} rounded px-1.5 py-0.5"
+									>{bug.severity}</span
+								>
 								<span class="text-sm text-white">{bug.description}</span>
 							</div>
 							<div class="ml-2 shrink-0 text-right text-xs">
