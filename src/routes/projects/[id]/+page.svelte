@@ -69,13 +69,13 @@
 	const patchWeeksEstimate = $derived($availableWu > 0 ? Math.ceil(patchWuCost / $availableWu) : 0);
 
 	const activePatch = $derived(
-		$game.activePatchJob?.projectId === id ? $game.activePatchJob : null
+		$game.activePatchJobs.find((j) => j.projectId === id) ?? null
 	);
 
 	const hasMajorReleaseInDev = $derived(
 		$game.projects.some((p) => p.isMajorRelease && p.status === 'in_development')
 	);
-	const canPlanMajorRelease = $derived(!hasMajorReleaseInDev && $game.activePatchJob === null);
+	const canPlanMajorRelease = $derived(!hasMajorReleaseInDev && activePatch === null);
 
 	function togglePatchBug(bugId: string) {
 		if (patchSelectedBugIds.includes(bugId)) {
@@ -89,13 +89,16 @@
 		if (!project || patchSelectedBugIds.length === 0) return;
 		game.update((s) => ({
 			...s,
-			activePatchJob: {
-				projectId: project.id,
-				wuRequired: patchWuCost,
-				wuInvested: 0,
-				bugIdsToFix: [...patchSelectedBugIds],
-				weekStarted: s.meta.week
-			},
+			activePatchJobs: [
+				...s.activePatchJobs,
+				{
+					projectId: project.id,
+					wuRequired: patchWuCost,
+					wuInvested: 0,
+					bugIdsToFix: [...patchSelectedBugIds],
+					weekStarted: s.meta.week
+				}
+			],
 			notifications: (
 				[
 					{
@@ -115,7 +118,7 @@
 	function cancelPatch() {
 		game.update((s) => ({
 			...s,
-			activePatchJob: null,
+			activePatchJobs: s.activePatchJobs.filter((j) => j.projectId !== id),
 			notifications: (
 				[
 					{
@@ -799,7 +802,7 @@
 				</div>
 
 				<!-- Release patch button -->
-				{#if !activePatch && !$game.activePatchJob}
+				{#if !activePatch}
 					<button
 						onclick={() => {
 							showPatchModal = true;
@@ -809,10 +812,6 @@
 					>
 						🩹 Release Patch →
 					</button>
-				{:else if $game.activePatchJob && $game.activePatchJob.projectId !== id}
-					<p class="text-xs text-gray-500">
-						A patch is active on another product. Complete it first.
-					</p>
 				{/if}
 			{/if}
 		</div>
@@ -845,7 +844,7 @@
 			</div>
 			{#if hasMajorReleaseInDev}
 				<p class="text-xs text-gray-500">A major release is already in development.</p>
-			{:else if $game.activePatchJob !== null}
+			{:else if activePatch !== null}
 				<p class="text-xs text-gray-500">
 					Complete the active patch before planning a major release.
 				</p>
@@ -876,7 +875,7 @@
 			</div>
 			{#if hasMajorReleaseInDev}
 				<p class="text-xs text-gray-500">A major release is already in development.</p>
-			{:else if $game.activePatchJob !== null}
+			{:else if activePatch !== null}
 				<p class="text-xs text-gray-500">
 					Complete the active patch before planning a major release.
 				</p>

@@ -94,13 +94,20 @@ export function advanceWeek(state: GameState): GameState {
 	const availableWu = getAvailableWu(s);
 	const rp = getRpPerWeek();
 
-	// 1. Advance active patch job (consumes WU before project development)
+	// 1. Advance active patch jobs (consume WU before project development, split evenly)
 	let wuForProject = availableWu;
-	if (s.activePatchJob) {
-		s.activePatchJob.wuInvested += availableWu;
-		wuForProject = 0; // patch consumes all WU
-		if (s.activePatchJob.wuInvested >= s.activePatchJob.wuRequired) {
-			s = completePatch(s);
+	if (s.activePatchJobs.length > 0) {
+		const wuPerPatch = availableWu / s.activePatchJobs.length;
+		wuForProject = 0;
+		s.activePatchJobs = s.activePatchJobs.map((job) => ({
+			...job,
+			wuInvested: job.wuInvested + wuPerPatch
+		}));
+		const completedIds = s.activePatchJobs
+			.filter((job) => job.wuInvested >= job.wuRequired)
+			.map((job) => job.projectId);
+		for (const pid of completedIds) {
+			s = completePatch(s, pid);
 		}
 	}
 

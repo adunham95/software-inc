@@ -85,10 +85,12 @@
 		}
 	}
 
-	// Active patch job info
-	const activePatch = $derived($game.activePatchJob);
-	const patchProject = $derived(
-		activePatch ? $game.projects.find((p) => p.id === activePatch.projectId) : null
+	// Active patch jobs info
+	const activePatchJobs = $derived(
+		$game.activePatchJobs.map((job) => ({
+			job,
+			project: $game.projects.find((p) => p.id === job.projectId) ?? null
+		}))
 	);
 </script>
 
@@ -186,48 +188,39 @@
 				<ProjectCard {project} />
 			{/each}
 
-			<!-- Active Patch Job Card -->
-			{#if activePatch && patchProject}
-				<a
-					href="/projects/{patchProject.id}"
-					class="block rounded-xl border border-navy-600 bg-navy-700 p-4 transition-all hover:border-blue-600"
-				>
-					<div class="mb-2 flex items-center justify-between">
-						<span class="text-sm font-semibold text-blue-300"
-							>🩹 Patching "{patchProject.name}"</span
-						>
-						<span class="font-mono text-xs text-gray-400">
-							{activePatch.wuInvested}/{activePatch.wuRequired} WU
-						</span>
-					</div>
-					<div class="mb-1 h-1.5 w-full overflow-hidden rounded-full bg-navy-600">
-						<div
-							class="h-full rounded-full bg-blue-500 transition-all"
-							style="width: {Math.min(
-								100,
-								(activePatch.wuInvested / activePatch.wuRequired) * 100
-							)}%"
-						></div>
-					</div>
-					<div class="text-xs text-gray-500">
-						Fixing {activePatch.bugIdsToFix.length} bug(s)
-					</div>
-				</a>
-			{/if}
+			<!-- Active Patch Job Cards -->
+			{#each activePatchJobs as { job, project: patchProject } (job.projectId)}
+				{#if patchProject}
+					<a
+						href="/projects/{patchProject.id}"
+						class="block rounded-xl border border-navy-600 bg-navy-700 p-4 transition-all hover:border-blue-600"
+					>
+						<div class="mb-2 flex items-center justify-between">
+							<span class="text-sm font-semibold text-blue-300"
+								>🩹 Patching "{patchProject.name}"</span
+							>
+							<span class="font-mono text-xs text-gray-400">
+								{Math.round(job.wuInvested)}/{job.wuRequired} WU
+							</span>
+						</div>
+						<div class="mb-1 h-1.5 w-full overflow-hidden rounded-full bg-navy-600">
+							<div
+								class="h-full rounded-full bg-blue-500 transition-all"
+								style="width: {Math.min(100, (job.wuInvested / job.wuRequired) * 100)}%"
+							></div>
+						</div>
+						<div class="text-xs text-gray-500">
+							Fixing {job.bugIdsToFix.length} bug(s)
+						</div>
+					</a>
+				{/if}
+			{/each}
 
-			{#if !inDevProjects.length && !activePatch}
-				<a
-					href="/projects/new"
-					class="flex items-center justify-center rounded-xl border border-dashed border-gray-600 bg-navy-700 p-4 text-sm text-gray-400 transition-all hover:border-neon/50 hover:text-gray-200"
-				>
-					+ New Project
-				</a>
-			{:else if !inDevProjects.length && activePatch}
-				<!-- Show new project link disabled while patch is active -->
+			{#if !inDevProjects.length && activePatchJobs.length > 0}
 				<div
 					class="flex items-center justify-center rounded-xl border border-dashed border-gray-700 p-4 text-sm text-gray-600"
 				>
-					Complete patch to start a new project
+					Complete patches to start a new project
 				</div>
 			{:else}
 				<a

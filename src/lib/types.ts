@@ -202,5 +202,5 @@ export interface GameState {
 	notifications: Notification[];
 	expenses: ExpenseState;
 	pendingHostingChoiceId: string | null;
-	activePatchJob: PatchJob | null;
+	activePatchJobs: PatchJob[];
 }

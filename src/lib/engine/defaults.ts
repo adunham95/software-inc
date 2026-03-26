@@ -32,6 +32,6 @@ export function defaultGameState(): GameState {
 			weeklySelfCost: 200
 		},
 		pendingHostingChoiceId: null,
-		activePatchJob: null
+		activePatchJobs: []
 	};
 }

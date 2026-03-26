@@ -152,7 +152,7 @@
 		)
 	);
 
-	const hasPatchJob = $derived($game.activePatchJob !== null);
+	const hasPatchJob = $derived($game.activePatchJobs.length > 0);
 	const hasMajorReleaseInDev = $derived(
 		$game.projects.some((p) => p.isMajorRelease && p.status === 'in_development')
 	);

@@ -14,9 +14,14 @@ function migrateSave(raw: GameState): GameState {
 	if (raw.pendingHostingChoiceId === undefined) {
 		raw = { ...raw, pendingHostingChoiceId: null };
 	}
-	// Add activePatchJob if missing
-	if (raw.activePatchJob === undefined) {
-		raw = { ...raw, activePatchJob: null };
+	// Migrate activePatchJob (single) → activePatchJobs (array)
+	if ((raw as any).activePatchJob !== undefined && raw.activePatchJobs === undefined) {
+		const old = (raw as any).activePatchJob;
+		const { activePatchJob: _, ...rest } = raw as any;
+		raw = { ...rest, activePatchJobs: old ? [old] : [] };
+	}
+	if (raw.activePatchJobs === undefined) {
+		raw = { ...raw, activePatchJobs: [] };
 	}
 	// Add hosting fields to existing projects if missing
 	// Also add all new fields from Categories + Bugs specs

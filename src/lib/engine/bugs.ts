@@ -153,12 +153,12 @@ export function checkEscalation(state: GameState): GameState {
 	return s;
 }
 
-export function completePatch(state: GameState): GameState {
-	const job = state.activePatchJob;
+export function completePatch(state: GameState, projectId: string): GameState {
+	const job = state.activePatchJobs.find((j) => j.projectId === projectId);
 	if (!job) return state;
 
 	const project = state.projects.find((p) => p.id === job.projectId);
-	if (!project) return { ...state, activePatchJob: null };
+	if (!project) return { ...state, activePatchJobs: state.activePatchJobs.filter((j) => j.projectId !== projectId) };
 
 	// Fix selected bugs
 	const updatedBugs = project.bugs.map((b) =>
@@ -191,7 +191,7 @@ export function completePatch(state: GameState): GameState {
 	return {
 		...state,
 		projects: state.projects.map((p) => (p.id === job.projectId ? updatedProject : p)),
-		activePatchJob: null,
+		activePatchJobs: state.activePatchJobs.filter((j) => j.projectId !== projectId),
 		notifications: [
 			{
 				id: crypto.randomUUID(),
