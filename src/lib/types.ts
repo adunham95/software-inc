@@ -80,6 +80,7 @@ export type CampaignType =
 	| 'influencer_deal'
 	| 'product_hunt_launch'
 	| 'paid_ads'
+	| 'paid_ads_targeted'
 	| 'content_marketing';
 
 export interface CampaignEffect {
