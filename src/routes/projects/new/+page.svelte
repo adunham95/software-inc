@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { game } from '$lib/stores/gameStore';
-	import { PROJECT_TYPES, FEATURE_POOLS, PRICE_RANGES, LAPTOP_TIERS } from '$lib/engine/projects';
+	import { PROJECT_TYPES, FEATURE_POOLS, PRICE_RANGES, LAPTOP_TIERS, ADVERTISING_FEATURE, CATEGORY_FEATURE_POOLS, CATEGORIES_FOR_TYPE, CATEGORY_LABELS } from '$lib/engine/projects';
 	import { estimateWeeklyRevenue } from '$lib/engine/pricing';
 	import { availableWu } from '$lib/stores/derived';
 	import FeatureCheckList from '$lib/components/FeatureCheckList.svelte';
-	import type { ProjectType, ProjectFeature, Notification } from '$lib/types';
+	import type { ProjectType, ProjectCategory, ProjectFeature, Notification } from '$lib/types';
 
 	let name = $state('');
 	let type = $state<ProjectType>('basic_website');
+	let category = $state<ProjectCategory | null>(null);
 	let showAllTypes = $state(false);
 	let pricingModel = $state<'one_time' | 'subscription'>('one_time');
 	let price = $state(5);
@@ -41,13 +42,29 @@
 		}
 	});
 
-	const features = $derived(FEATURE_POOLS[type] ?? []);
+	// Reset category when type changes
+	$effect(() => {
+		type;
+		category = null;
+		selectedFeatureIds = [];
+		const range = PRICE_RANGES[type][pricingModel === 'one_time' ? 'oneTime' : 'subscription'];
+		price = Math.round((range[0] + range[1]) / 2);
+	});
+
+	const categoriesForType = $derived(CATEGORIES_FOR_TYPE[type] ?? []);
+
+	// Merge base + category + advertising features
+	const features = $derived(() => {
+		const base = FEATURE_POOLS[type] ?? [];
+		const catFeatures = category ? (CATEGORY_FEATURE_POOLS[type]?.[category] ?? []) : [];
+		return [...base, ...catFeatures, ADVERTISING_FEATURE];
+	});
 
 	const priceRange = $derived(PRICE_RANGES[type][pricingModel === 'one_time' ? 'oneTime' : 'subscription']);
 
 	const totalWu = $derived(
 		PROJECT_TYPES[type].baseWu +
-			features
+			features()
 				.filter((f) => selectedFeatureIds.includes(f.id))
 				.reduce((s, f) => s + f.wuCost, 0)
 	);
@@ -55,7 +72,7 @@
 	const estimatedWeeks = $derived(wu > 0 ? Math.ceil(totalWu / wu) : 0);
 
 	const selectedFeatureRevenue = $derived(
-		features
+		features()
 			.filter((f) => selectedFeatureIds.includes(f.id))
 			.reduce((s, f) => s + f.revenueBoost, 0)
 	);
@@ -72,9 +89,15 @@
 	);
 
 	const hasActiveProject = $derived($game.projects.some((p) => p.status === 'in_development'));
+	const hasPatchJob = $derived($game.activePatchJob !== null);
 
 	const canStart = $derived(
-		name.trim().length > 0 && selectedFeatureIds.length > 0 && !hasActiveProject && wu > 0
+		name.trim().length > 0 &&
+			selectedFeatureIds.length > 0 &&
+			category !== null &&
+			!hasActiveProject &&
+			!hasPatchJob &&
+			wu > 0
 	);
 
 	function toggleFeature(id: string) {
@@ -84,14 +107,6 @@
 			selectedFeatureIds = [...selectedFeatureIds, id];
 		}
 	}
-
-	// Reset selections when type changes
-	$effect(() => {
-		type;
-		selectedFeatureIds = [];
-		const range = PRICE_RANGES[type][pricingModel === 'one_time' ? 'oneTime' : 'subscription'];
-		price = Math.round((range[0] + range[1]) / 2);
-	});
 
 	$effect(() => {
 		pricingModel;
@@ -104,13 +119,14 @@
 	}
 
 	function startProject() {
-		if (!canStart) return;
+		if (!canStart || !category) return;
 
-		const selectedFeatures: ProjectFeature[] = features
+		const allFeatures = features();
+		const selectedFeatures: ProjectFeature[] = allFeatures
 			.filter((f) => selectedFeatureIds.includes(f.id))
 			.map((f) => ({
 				...f,
-				status: 'not_started',
+				status: 'not_started' as const,
 				progressWu: 0
 			}));
 
@@ -124,7 +140,8 @@
 					id,
 					name: name.trim(),
 					type,
-					status: 'in_development',
+					category,
+					status: 'in_development' as const,
 					pricingModel,
 					price,
 					progress: 0,
@@ -134,17 +151,26 @@
 					bugsFixed: 0,
 					features: selectedFeatures,
 					weeklyRevenue: 0,
+					adRevenue: 0,
 					activeSubscribers: 0,
 					revenueDecayRate: 0.5,
 					weeksOnMarket: 0,
 					totalRevenue: 0,
 					revenueHistory: [],
-					hostingType: 'none',
+					hostingType: 'none' as const,
 					hostingCostPerWeek: 0,
 					hostingWuDrainPerWeek: 0,
 					weekStarted: s.meta.week,
 					weekShipped: null,
-					techRequired: PROJECT_TYPES[type].requires
+					techRequired: PROJECT_TYPES[type].requires,
+					bugs: [],
+					bugAccumulator: 0,
+					totalBugsFixed: 0,
+					lastPatchedWeek: null,
+					version: '1.0',
+					parentProjectId: null,
+					isMajorRelease: false,
+					archivedWeek: null
 				}
 			],
 			notifications: ([
@@ -176,6 +202,11 @@
 			⚠️ You already have a project in development. Complete or cancel it before starting a new one.
 		</div>
 	{/if}
+	{#if hasPatchJob}
+		<div class="rounded-xl border border-yellow-700 bg-yellow-950 p-4 text-sm text-yellow-300">
+			⚠️ A patch is in progress. Wait for it to complete before starting a new project.
+		</div>
+	{/if}
 
 	<!-- Name -->
 	<div>
@@ -194,7 +225,7 @@
 	<!-- Type -->
 	<div>
 		<div class="mb-2 flex items-center justify-between">
-			<label class="text-sm font-medium text-gray-300">Project Type</label>
+			<span class="text-sm font-medium text-gray-300">Project Type</span>
 			<div class="bg-navy-700 border-navy-600 flex rounded-lg border p-0.5">
 				<button
 					onclick={() => (showAllTypes = false)}
@@ -236,6 +267,29 @@
 							</span>
 						{/if}
 					</div>
+				</button>
+			{/each}
+		</div>
+	</div>
+
+	<!-- Category -->
+	<div>
+		<div class="mb-2 text-sm font-medium text-gray-300">
+			Category <span class="font-normal text-gray-500">(required)</span>
+		</div>
+		<div class="grid grid-cols-2 gap-2">
+			{#each categoriesForType as cat (cat)}
+				<button
+					onclick={() => { category = cat; selectedFeatureIds = []; }}
+					class="rounded-xl border px-3 py-2.5 text-sm font-medium transition-all text-left"
+					class:border-neon={category === cat}
+					class:bg-neon={category === cat}
+					class:text-navy={category === cat}
+					class:border-navy-600={category !== cat}
+					class:bg-navy-700={category !== cat}
+					class:text-gray-300={category !== cat}
+				>
+					{CATEGORY_LABELS[cat] ?? cat}
 				</button>
 			{/each}
 		</div>
@@ -291,18 +345,24 @@
 	</div>
 
 	<!-- Features -->
-	<div>
-		<div class="mb-2 text-sm font-medium text-gray-300">
-			Features
-			<span class="ml-1 font-normal text-gray-500">(select at least 1)</span>
+	{#if category !== null}
+		<div>
+			<div class="mb-2 text-sm font-medium text-gray-300">
+				Features
+				<span class="ml-1 font-normal text-gray-500">(select at least 1)</span>
+			</div>
+			<FeatureCheckList
+				features={features()}
+				selected={selectedFeatureIds}
+				{completedResearch}
+				onToggle={toggleFeature}
+			/>
 		</div>
-		<FeatureCheckList
-			{features}
-			selected={selectedFeatureIds}
-			{completedResearch}
-			onToggle={toggleFeature}
-		/>
-	</div>
+	{:else}
+		<div class="rounded-xl border border-dashed border-gray-600 bg-navy-700/50 p-4 text-center text-sm text-gray-500">
+			Select a category to see available features
+		</div>
+	{/if}
 
 	<!-- Live Summary -->
 	<div class="bg-navy-700 border-navy-600 rounded-xl border p-4">

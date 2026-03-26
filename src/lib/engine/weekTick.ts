@@ -1,7 +1,8 @@
 import type { GameState, Project, ProjectFeature } from '$lib/types';
 import { calcInitialRevenue, calcInitialSubscribers, tickShippedProject } from './pricing';
 import { maybeFireEvent } from './events';
-import { LAPTOP_TIERS, HOSTING_EXTERNAL_COST, HOSTING_WU_DRAIN, NEEDS_HOSTING } from './projects';
+import { LAPTOP_TIERS, HOSTING_EXTERNAL_COST, HOSTING_WU_DRAIN, NEEDS_HOSTING, AD_RATE_PER_USER } from './projects';
+import { generateBug, calcBugsThisWeek, checkEscalation, completePatch, calcWeeklyTraffic } from './bugs';
 
 function getBaseLaptopWu(state: GameState): number {
 	return LAPTOP_TIERS[state.expenses.laptopTier].wuPerWeek;
@@ -72,12 +73,22 @@ export function advanceWeek(state: GameState): GameState {
 	const availableWu = getAvailableWu(s);
 	const rp = getRpPerWeek();
 
-	// 1. Tick active development project
+	// 1. Advance active patch job (consumes WU before project development)
+	let wuForProject = availableWu;
+	if (s.activePatchJob) {
+		s.activePatchJob.wuInvested += availableWu;
+		wuForProject = 0; // patch consumes all WU
+		if (s.activePatchJob.wuInvested >= s.activePatchJob.wuRequired) {
+			s = completePatch(s);
+		}
+	}
+
+	// 2. Tick active development project (only if no patch running)
 	const activeProject = s.projects.find((p) => p.status === 'in_development');
 	let newPendingHostingId: string | null = s.pendingHostingChoiceId;
 
-	if (activeProject && availableWu > 0) {
-		const updated = tickActiveProject(activeProject, availableWu);
+	if (activeProject && wuForProject > 0) {
+		const updated = tickActiveProject(activeProject, wuForProject);
 
 		// Check if all features complete → ship!
 		const allComplete = updated.features.every((f) => f.status === 'complete');
@@ -121,7 +132,7 @@ export function advanceWeek(state: GameState): GameState {
 
 	s.pendingHostingChoiceId = newPendingHostingId;
 
-	// 2. Tick active research
+	// 3. Tick active research
 	if (s.research.inProgress) {
 		s.research.progressWu += rp;
 		const node = s.research.tree.find((n) => n.id === s.research.inProgress);
@@ -140,11 +151,23 @@ export function advanceWeek(state: GameState): GameState {
 		}
 	}
 
-	// 3. Deduct self/living costs
+	// 4. Deduct self/living costs
 	const selfCost = s.expenses.weeklySelfCost;
 	s.meta.cash -= selfCost;
 
-	// 4. Deduct external hosting costs + apply outage risk for self-hosted; collect revenue
+	// 5. Accumulate bugs on all shipped/dead products
+	s.projects = s.projects.map((p) => {
+		if (p.status !== 'shipped' && p.status !== 'dead') return p;
+		let proj = { ...p, bugs: [...p.bugs] };
+		proj.bugAccumulator += calcBugsThisWeek(proj);
+		while (proj.bugAccumulator >= 1) {
+			proj.bugs = [...proj.bugs, generateBug(proj, week)];
+			proj.bugAccumulator -= 1;
+		}
+		return proj;
+	});
+
+	// 6. Deduct external hosting costs + apply outage risk for self-hosted; collect revenue
 	let externalHostingTotal = 0;
 	let weeklyIncome = 0;
 
@@ -162,7 +185,6 @@ export function advanceWeek(state: GameState): GameState {
 				),
 				...s.notifications
 			].slice(0, 50);
-			// Return project unchanged (no revenue tick, no WU tick)
 			return p;
 		}
 
@@ -172,15 +194,47 @@ export function advanceWeek(state: GameState): GameState {
 			s.meta.cash -= p.hostingCostPerWeek;
 		}
 
-		const ticked = tickShippedProject(p);
-		weeklyIncome += ticked.weeklyRevenue;
+		// Tick revenue
+		let ticked = tickShippedProject(p);
+
+		// Apply bug revenue impact
+		const unfixedBugs = ticked.bugs.filter((b) => !b.fixed);
+		const bugLoss = unfixedBugs.reduce((sum, b) => sum + b.revenueImpact, 0);
+
+		// Escalation revenue penalty
+		const unfixedCount = unfixedBugs.length;
+		let escalationPenalty = 0;
+		if (unfixedCount >= 6) {
+			escalationPenalty = ticked.weeklyRevenue * 0.04 * unfixedCount;
+		} else if (unfixedCount >= 3) {
+			escalationPenalty = ticked.weeklyRevenue * 0.02 * unfixedCount;
+		}
+
+		ticked = {
+			...ticked,
+			weeklyRevenue: Math.max(0, ticked.weeklyRevenue - bugLoss - escalationPenalty)
+		};
+
+		// Ad revenue (if advertising feature is complete)
+		const hasAds = ticked.features.some((f) => f.id === 'advertising' && f.status === 'complete');
+		let adRevenue = 0;
+		if (hasAds) {
+			const traffic = calcWeeklyTraffic(ticked);
+			adRevenue = Math.round(traffic * AD_RATE_PER_USER[ticked.type]);
+		}
+		ticked = { ...ticked, adRevenue };
+
+		weeklyIncome += ticked.weeklyRevenue + adRevenue;
 		return ticked;
 	});
 
 	s.meta.cash += weeklyIncome;
 	s.meta.totalEarned += weeklyIncome;
 
-	// 5. Weekly expense summary notification
+	// 7. Check escalation thresholds (bugs → reputation damage / death)
+	s = checkEscalation(s);
+
+	// 8. Weekly expense summary notification
 	const netChange = weeklyIncome - selfCost - externalHostingTotal;
 	const sign = netChange >= 0 ? '+' : '';
 	s.notifications = [
@@ -192,7 +246,7 @@ export function advanceWeek(state: GameState): GameState {
 		...s.notifications
 	].slice(0, 50);
 
-	// 6. WU warning if overloaded
+	// 9. WU warning if overloaded
 	if (availableWu <= 0) {
 		s.notifications = [
 			makeNotif(
@@ -204,14 +258,14 @@ export function advanceWeek(state: GameState): GameState {
 		].slice(0, 50);
 	}
 
-	// 7. Advance time
+	// 10. Advance time
 	s.meta.week = week + 1;
 	if (s.meta.week > 52) {
 		s.meta.week = 1;
 		s.meta.year += 1;
 	}
 
-	// 8. Random events
+	// 11. Random events
 	s = maybeFireEvent(s);
 
 	return s;

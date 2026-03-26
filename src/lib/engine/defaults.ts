@@ -7,7 +7,7 @@ export function defaultGameState(): GameState {
 			companyName: 'My Startup',
 			week: 1,
 			year: 1,
-			cash: 50000,
+			cash: 5000,
 			reputation: 10,
 			totalEarned: 0
 		},
@@ -31,6 +31,7 @@ export function defaultGameState(): GameState {
 			selfCostTier: 'bedroom',
 			weeklySelfCost: 200
 		},
-		pendingHostingChoiceId: null
+		pendingHostingChoiceId: null,
+		activePatchJob: null
 	};
 }

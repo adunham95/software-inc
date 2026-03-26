@@ -6,6 +6,42 @@ export type ProjectType =
 	| 'desktop_app'
 	| 'ai_product';
 
+export type ProjectCategory =
+	// Basic Website
+	| 'blog'
+	| 'news'
+	| 'portfolio'
+	| 'landing_page'
+	| 'community_forum'
+	// Mobile App
+	| 'dating'
+	| 'chat'
+	| 'entertainment'
+	| 'fitness'
+	| 'education'
+	// SaaS Tool
+	| 'productivity'
+	| 'crm'
+	| 'analytics'
+	| 'devtools'
+	| 'finance'
+	// Desktop App (productivity shared with SaaS)
+	| 'video_game'
+	| 'media_player'
+	| 'developer_tool'
+	| 'security'
+	// Browser Extension (productivity shared, developer distinct from devtools)
+	| 'privacy'
+	| 'shopping'
+	| 'developer'
+	| 'social'
+	// AI Product
+	| 'writing_assistant'
+	| 'code_assistant'
+	| 'image_generation'
+	| 'data_analysis'
+	| 'customer_support';
+
 export interface ProjectFeature {
 	id: string;
 	name: string;
@@ -18,11 +54,29 @@ export interface ProjectFeature {
 	unlockRequires: string[];
 }
 
+export interface Bug {
+	id: string;
+	weekDiscovered: number;
+	severity: 'minor' | 'major' | 'critical';
+	description: string;
+	revenueImpact: number;
+	fixed: boolean;
+}
+
+export interface PatchJob {
+	projectId: string;
+	wuRequired: number;
+	wuInvested: number;
+	bugIdsToFix: string[];
+	weekStarted: number;
+}
+
 export interface Project {
 	id: string;
 	name: string;
 	type: ProjectType;
-	status: 'in_development' | 'shipped' | 'cancelled';
+	category: ProjectCategory | null;
+	status: 'in_development' | 'shipped' | 'dead' | 'archived' | 'cancelled';
 
 	pricingModel: 'one_time' | 'subscription';
 	price: number;
@@ -36,6 +90,7 @@ export interface Project {
 	features: ProjectFeature[];
 
 	weeklyRevenue: number;
+	adRevenue: number;
 	activeSubscribers: number;
 	revenueDecayRate: number;
 	weeksOnMarket: number;
@@ -44,8 +99,20 @@ export interface Project {
 
 	// Hosting
 	hostingType: 'external' | 'self' | 'none';
-	hostingCostPerWeek: number; // $0 if self-hosted or none
-	hostingWuDrainPerWeek: number; // 0 if external or none
+	hostingCostPerWeek: number;
+	hostingWuDrainPerWeek: number;
+
+	// Bug tracking
+	bugs: Bug[];
+	bugAccumulator: number;
+	totalBugsFixed: number;
+	lastPatchedWeek: number | null;
+
+	// Version / lineage
+	version: string;
+	parentProjectId: string | null;
+	isMajorRelease: boolean;
+	archivedWeek: number | null;
 
 	weekStarted: number;
 	weekShipped: number | null;
@@ -100,4 +167,5 @@ export interface GameState {
 	notifications: Notification[];
 	expenses: ExpenseState;
 	pendingHostingChoiceId: string | null;
+	activePatchJob: PatchJob | null;
 }

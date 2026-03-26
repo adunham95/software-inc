@@ -53,17 +53,17 @@ interface Project {
 
 Research now has an upfront cash cost paid when the player starts a research node. If the player cannot afford it, the node is unselectable (shown with a lock + price tag).
 
-| Research ID | Upfront Cost |
-|---|---|
-| `web_basics` | $500 |
-| `mobile_dev` | $1,000 |
-| `cloud_hosting` | $2,500 |
-| `agile_process` | $300 |
-| `ui_ux` | $800 |
-| `ai_features` | $8,000 |
-| `devops` | $3,000 |
-| `security` | $1,500 |
-| `monetization` | $1,000 |
+| Research ID     | Upfront Cost |
+| --------------- | ------------ |
+| `web_basics`    | $500         |
+| `mobile_dev`    | $1,000       |
+| `cloud_hosting` | $2,500       |
+| `agile_process` | $300         |
+| `ui_ux`         | $800         |
+| `ai_features`   | $8,000       |
+| `devops`        | $3,000       |
+| `security`      | $1,500       |
+| `monetization`  | $1,000       |
 
 Research costs represent courses, books, conference tickets, and online subscriptions. Shown as a one-time deduction from cash the moment research begins. The `/research` page should display the cost on each node card alongside weeks to complete.
 
@@ -75,12 +75,12 @@ A flat weekly cost representing the player's personal expenses — rent, food, u
 
 The player starts on `bedroom` tier. Tier upgrades are purchased from a new **"Life"** tab or section (see UI below). Downgrades are also allowed.
 
-| Tier | Label | Weekly Cost | Flavour |
-|---|---|---|---|
-| `bedroom` | Bedroom Startup | $200/wk | Living with parents, ramen diet |
-| `apartment` | Solo Apartment | $600/wk | Your own place, basic setup |
-| `home_office` | Home Office | $1,200/wk | Decent desk, fast internet, coffee machine |
-| `coworking` | Coworking Space | $2,500/wk | Hot desk, networking events, free oat milk |
+| Tier          | Label           | Weekly Cost | Flavour                                    |
+| ------------- | --------------- | ----------- | ------------------------------------------ |
+| `bedroom`     | Bedroom Startup | $200/wk     | Living with parents, ramen diet            |
+| `apartment`   | Solo Apartment  | $600/wk     | Your own place, basic setup                |
+| `home_office` | Home Office     | $1,200/wk   | Decent desk, fast internet, coffee machine |
+| `coworking`   | Coworking Space | $2,500/wk   | Hot desk, networking events, free oat milk |
 
 Tier affects nothing mechanically beyond cost — it is purely an expense sink that escalates naturally as the player earns more and wants to "level up" their lifestyle. Shown in the dashboard header as a small lifestyle badge.
 
@@ -90,12 +90,12 @@ Tier affects nothing mechanically beyond cost — it is purely an expense sink t
 
 The player's laptop determines their base WU output per week and gates certain project types.
 
-| Tier | Name | WU/week | Unlocks | Purchase Price |
-|---|---|---|---|---|
-| 1 | Old Laptop | 5 | Basic Website, Browser Extension | Starting equipment (free) |
-| 2 | Mid-Range Laptop | 7 | Mobile App, SaaS Tool, Desktop App | $1,500 |
-| 3 | Pro Laptop | 10 | All current types | $4,000 |
-| 4 | Dev Workstation | 14 | AI Product | $12,000 |
+| Tier | Name             | WU/week | Unlocks                            | Purchase Price            |
+| ---- | ---------------- | ------- | ---------------------------------- | ------------------------- |
+| 1    | Old Laptop       | 5       | Basic Website, Browser Extension   | Starting equipment (free) |
+| 2    | Mid-Range Laptop | 7       | Mobile App, SaaS Tool, Desktop App | $1,500                    |
+| 3    | Pro Laptop       | 10      | All current types                  | $4,000                    |
+| 4    | Dev Workstation  | 14      | AI Product                         | $12,000                   |
 
 Hardware is a one-time purchase. Buying a new tier replaces the old one — no resale value.
 
@@ -116,6 +116,7 @@ Products that require hosting: **Mobile App, SaaS Tool, Desktop App, AI Product*
 The player chooses a hosting type **when the project ships** (not at creation). A modal appears on ship:
 
 > "Where will you host [Product Name]?"
+>
 > - External Hosting — $X/week, zero maintenance
 > - Self-Hosted — Free, but costs Y WU/week in upkeep
 
@@ -124,11 +125,11 @@ The player chooses a hosting type **when the project ships** (not at creation). 
 Costs scale with product type (bigger products need more server resources):
 
 | Product Type | External Cost/Week |
-|---|---|
-| Mobile App | $150/wk |
-| SaaS Tool | $400/wk |
-| Desktop App | $100/wk |
-| AI Product | $1,200/wk |
+| ------------ | ------------------ |
+| Mobile App   | $150/wk            |
+| SaaS Tool    | $400/wk            |
+| Desktop App  | $100/wk            |
+| AI Product   | $1,200/wk          |
 
 No WU drain. No outage risk. Just a weekly cash cost deducted automatically.
 
@@ -137,13 +138,14 @@ No WU drain. No outage risk. Just a weekly cash cost deducted automatically.
 Free cash cost, but drains WU from the player's weekly budget. The player effectively has fewer WU to spend on development or patches that week.
 
 | Product Type | WU Drain/Week |
-|---|---|
-| Mobile App | 1 WU/wk |
-| SaaS Tool | 2 WU/wk |
-| Desktop App | 1 WU/wk |
-| AI Product | 4 WU/wk |
+| ------------ | ------------- |
+| Mobile App   | 1 WU/wk       |
+| SaaS Tool    | 2 WU/wk       |
+| Desktop App  | 1 WU/wk       |
+| AI Product   | 4 WU/wk       |
 
 Self-hosted products also have an **outage risk**: each week there is a small chance (5% base) of a self-hosting outage event:
+
 - Revenue = $0 for that week
 - Notification: "⚡ [Product] went down — self-hosted server crashed. No revenue this week."
 - Outage risk is reduced by completing `devops` research (5% → 2%)
@@ -219,12 +221,15 @@ Shows all four tiers as selectable cards. Current tier highlighted. Player can t
 ## Dashboard Updates
 
 ### Stats Row (updated)
+
 Add a fourth chip: **Expenses/wk** — shows total weekly outgoings (self cost + all hosting costs).
 
 ### Header
+
 Add a small lifestyle tier badge next to company name (e.g. "🛏️ Bedroom" or "☕ Coworking").
 
 ### Weekly Summary Notification
+
 Replace the plain notification with a structured weekly summary card (collapsible) showing the revenue/expense breakdown described above.
 
 ---
@@ -240,7 +245,7 @@ expenses: {
 }
 ```
 
-Starting cash is $50,000 as before — enough to survive a while on bedroom costs and buy Tier 2 hardware fairly quickly, but not enough to rush to Tier 4 without building revenue first.
+Starting cash is $5,000 as before — enough to survive a while on bedroom costs and buy Tier 2 hardware fairly quickly, but not enough to rush to Tier 4 without building revenue first.
 
 ---
 

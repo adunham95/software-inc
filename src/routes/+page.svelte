@@ -3,6 +3,7 @@
 	import {
 		totalWeeklyRevenue,
 		shippedProjects,
+		archivedProjects,
 		activeResearch,
 		researchWeeksRemaining,
 		totalWeeklyExpenses,
@@ -18,8 +19,12 @@
 
 	const inDevProjects = $derived($game.projects.filter((p) => p.status === 'in_development'));
 	const activeCount = $derived(inDevProjects.length + $shippedProjects.length);
+	const liveProjects = $derived($shippedProjects.filter((p) => p.status === 'shipped'));
+	const deadProjects = $derived($shippedProjects.filter((p) => p.status === 'dead'));
 
 	const lifestyleTier = $derived(SELF_COST_TIERS[$game.expenses.selfCostTier]);
+
+	let showArchivedSection = $state(false);
 
 	// Hosting choice modal
 	const pendingProject = $derived(
@@ -67,6 +72,12 @@
 			showReset = true;
 		}
 	}
+
+	// Active patch job info
+	const activePatch = $derived($game.activePatchJob);
+	const patchProject = $derived(
+		activePatch ? $game.projects.find((p) => p.id === activePatch.projectId) : null
+	);
 </script>
 
 <!-- Sticky Header -->
@@ -113,7 +124,7 @@
 		</div>
 	{/if}
 
-	<!-- Active Projects -->
+	<!-- Active Projects + Patch -->
 	<section>
 		<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">
 			In Development
@@ -122,24 +133,93 @@
 			{#each inDevProjects as project (project.id)}
 				<ProjectCard {project} />
 			{/each}
-			<a
-				href="/projects/new"
-				class="bg-navy-700 hover:border-neon/50 flex items-center justify-center rounded-xl border border-dashed border-gray-600 p-4 text-sm text-gray-400 transition-all hover:text-gray-200"
-			>
-				+ New Project
-			</a>
+
+			<!-- Active Patch Job Card -->
+			{#if activePatch && patchProject}
+				<a
+					href="/projects/{patchProject.id}"
+					class="bg-navy-700 border-navy-600 block rounded-xl border p-4 transition-all hover:border-blue-600"
+				>
+					<div class="mb-2 flex items-center justify-between">
+						<span class="text-sm font-semibold text-blue-300">🩹 Patching "{patchProject.name}"</span>
+						<span class="font-mono text-xs text-gray-400">
+							{activePatch.wuInvested}/{activePatch.wuRequired} WU
+						</span>
+					</div>
+					<div class="bg-navy-600 mb-1 h-1.5 w-full overflow-hidden rounded-full">
+						<div
+							class="h-full rounded-full bg-blue-500 transition-all"
+							style="width: {Math.min(100, (activePatch.wuInvested / activePatch.wuRequired) * 100)}%"
+						></div>
+					</div>
+					<div class="text-xs text-gray-500">
+						Fixing {activePatch.bugIdsToFix.length} bug(s)
+					</div>
+				</a>
+			{/if}
+
+			{#if !inDevProjects.length && !activePatch}
+				<a
+					href="/projects/new"
+					class="bg-navy-700 hover:border-neon/50 flex items-center justify-center rounded-xl border border-dashed border-gray-600 p-4 text-sm text-gray-400 transition-all hover:text-gray-200"
+				>
+					+ New Project
+				</a>
+			{:else if !inDevProjects.length && activePatch}
+				<!-- Show new project link disabled while patch is active -->
+				<div class="flex items-center justify-center rounded-xl border border-dashed border-gray-700 p-4 text-sm text-gray-600">
+					Complete patch to start a new project
+				</div>
+			{:else}
+				<a
+					href="/projects/new"
+					class="bg-navy-700 hover:border-neon/50 flex items-center justify-center rounded-xl border border-dashed border-gray-600 p-4 text-sm text-gray-400 transition-all hover:text-gray-200"
+				>
+					+ New Project
+				</a>
+			{/if}
 		</div>
 	</section>
 
-	<!-- Shipped Products -->
-	{#if $shippedProjects.length > 0}
+	<!-- Live Products -->
+	{#if liveProjects.length > 0}
 		<section>
 			<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">
 				Shipped Products
 			</h2>
 			<div class="space-y-3">
-				{#each $shippedProjects as project (project.id)}
+				{#each liveProjects as project (project.id)}
 					<ShippedProductCard {project} />
+				{/each}
+			</div>
+		</section>
+	{/if}
+
+	<!-- Dead Products -->
+	{#if deadProjects.length > 0}
+		<section>
+			<h2 class="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">
+				Dead Products
+			</h2>
+			<div class="space-y-3">
+				{#each deadProjects as project (project.id)}
+					<a
+						href="/projects/{project.id}"
+						class="block rounded-xl border border-gray-700 bg-gray-900 p-4 opacity-70 transition-all hover:opacity-100"
+					>
+						<div class="flex items-center justify-between">
+							<div class="flex items-center gap-2">
+								<span class="text-sm font-semibold text-gray-400">{project.name}</span>
+								<span class="rounded bg-gray-800 px-1.5 py-0.5 text-xs text-gray-500">💀 DEAD</span>
+								<span class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-xs text-gray-600">v{project.version}</span>
+							</div>
+							<span class="text-xs text-gray-600">→</span>
+						</div>
+						<div class="mt-1 text-xs text-gray-600">
+							{project.bugs.filter((b) => !b.fixed).length} unfixed bugs ·
+							${Math.round(project.totalRevenue).toLocaleString()} lifetime
+						</div>
+					</a>
 				{/each}
 			</div>
 		</section>
@@ -173,6 +253,37 @@
 			</a>
 		{/if}
 	</section>
+
+	<!-- Archived Products (collapsed) -->
+	{#if $archivedProjects.length > 0}
+		<section>
+			<button
+				onclick={() => (showArchivedSection = !showArchivedSection)}
+				class="mb-3 flex w-full items-center justify-between text-xs font-semibold uppercase tracking-widest text-gray-600 hover:text-gray-400 transition-colors"
+			>
+				<span>Archived ({$archivedProjects.length})</span>
+				<span>{showArchivedSection ? '▲' : '▼'}</span>
+			</button>
+			{#if showArchivedSection}
+				<div class="space-y-2">
+					{#each $archivedProjects as project (project.id)}
+						<a
+							href="/projects/{project.id}"
+							class="block rounded-xl border border-gray-800 bg-gray-950 p-3 transition-all hover:border-gray-600"
+						>
+							<div class="flex items-center justify-between text-sm">
+								<div class="flex items-center gap-2">
+									<span class="text-gray-500">📦 {project.name}</span>
+									<span class="font-mono text-xs text-gray-700">v{project.version}</span>
+								</div>
+								<span class="font-mono text-xs text-gray-600">${Math.round(project.totalRevenue).toLocaleString()} total</span>
+							</div>
+						</a>
+					{/each}
+				</div>
+			{/if}
+		</section>
+	{/if}
 
 	<!-- Notifications -->
 	{#if $game.notifications.length > 0}

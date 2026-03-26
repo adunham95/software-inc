@@ -14,7 +14,11 @@ export const activeProject = derived(
 );
 
 export const shippedProjects = derived(game, ($game) =>
-	$game.projects.filter((p) => p.status === 'shipped')
+	$game.projects.filter((p) => p.status === 'shipped' || p.status === 'dead')
+);
+
+export const archivedProjects = derived(game, ($game) =>
+	$game.projects.filter((p) => p.status === 'archived')
 );
 
 export const activeResearch = derived(game, ($game) => {
