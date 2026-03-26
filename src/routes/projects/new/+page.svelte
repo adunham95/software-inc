@@ -238,7 +238,12 @@
 					version,
 					parentProjectId: parentId,
 					isMajorRelease,
-					archivedWeek: null
+					archivedWeek: null,
+					marketing: {
+						passiveLevel: 'none' as const,
+						activeCampaign: null,
+						campaignHistory: []
+					}
 				}
 			],
 			notifications: ([

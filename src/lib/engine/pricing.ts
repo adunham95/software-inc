@@ -39,18 +39,25 @@ export function calcInitialSubscribers(project: Project, reputation: number): nu
 	return Math.round((qualityFactor * 0.6 + repFactor * 0.4) * 500);
 }
 
-export function tickShippedProject(project: Project): Project {
+export function tickShippedProject(
+	project: Project,
+	marketingDecayReduction = 0,
+	marketingGrowthMultiplier = 1
+): Project {
 	const p = { ...project, features: [...project.features] };
 
 	if (p.pricingModel === 'subscription') {
-		const churnRate = 0.03 - (p.quality / 100) * 0.015;
-		const newSubsRate = Math.max(0, 0.05 - p.weeksOnMarket * 0.001);
+		const baseChurnRate = 0.03 - (p.quality / 100) * 0.015;
+		const churnRate = Math.max(0.001, baseChurnRate - marketingDecayReduction / 100);
+		const baseNewSubsRate = Math.max(0, 0.05 - p.weeksOnMarket * 0.001);
+		const newSubsRate = baseNewSubsRate * marketingGrowthMultiplier;
 		const churn = Math.floor(p.activeSubscribers * churnRate);
 		const newSubs = Math.floor(p.activeSubscribers * newSubsRate);
 		p.activeSubscribers = Math.max(0, p.activeSubscribers - churn + newSubs);
 		p.weeklyRevenue = p.activeSubscribers * p.price;
 	} else {
-		p.weeklyRevenue = p.weeklyRevenue * (1 - p.revenueDecayRate / 100);
+		const effectiveDecayRate = Math.max(0.05, p.revenueDecayRate - marketingDecayReduction);
+		p.weeklyRevenue = p.weeklyRevenue * (1 - effectiveDecayRate / 100) * marketingGrowthMultiplier;
 	}
 
 	p.revenueHistory = [...p.revenueHistory.slice(-7), p.weeklyRevenue];

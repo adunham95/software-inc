@@ -1,6 +1,7 @@
 import { derived } from 'svelte/store';
 import { game } from './gameStore';
 import { LAPTOP_TIERS } from '$lib/engine/projects';
+import { PASSIVE_MARKETING_CONFIG, isCampaignInvesting } from '$lib/engine/marketing';
 
 export const totalWeeklyRevenue = derived(game, ($game) =>
 	$game.projects
@@ -38,21 +39,52 @@ export const selfHostingWuDrain = derived(game, ($game) =>
 		.reduce((sum, p) => sum + p.hostingWuDrainPerWeek, 0)
 );
 
+export const passiveMarketingWuDrain = derived(game, ($game) =>
+	$game.projects
+		.filter((p) => p.status === 'shipped')
+		.reduce((sum, p) => sum + PASSIVE_MARKETING_CONFIG[p.marketing.passiveLevel].wuPerWeek, 0)
+);
+
+export const campaignWuDrain = derived(game, ($game) =>
+	$game.projects.filter((p) => p.status === 'shipped' && isCampaignInvesting(p)).length
+);
+
 export const availableWu = derived(game, ($game) => {
 	const laptopWu = LAPTOP_TIERS[$game.expenses.laptopTier].wuPerWeek;
 	const agileBonus = $game.research.completed.includes('agile_process') ? 1 : 0;
-	const drain = $game.projects
+	const selfHostDrain = $game.projects
 		.filter((p) => p.status === 'shipped' && p.hostingType === 'self')
 		.reduce((sum, p) => sum + p.hostingWuDrainPerWeek, 0);
-	return laptopWu + agileBonus - drain;
+	const passiveMarketDrain = $game.projects
+		.filter((p) => p.status === 'shipped')
+		.reduce((sum, p) => sum + PASSIVE_MARKETING_CONFIG[p.marketing.passiveLevel].wuPerWeek, 0);
+	const campaignDrain = $game.projects.filter(
+		(p) => p.status === 'shipped' && isCampaignInvesting(p)
+	).length;
+	return laptopWu + agileBonus - selfHostDrain - passiveMarketDrain - campaignDrain;
 });
+
+export const passiveMarketingCashCost = derived(game, ($game) =>
+	$game.projects
+		.filter((p) => p.status === 'shipped')
+		.reduce(
+			(sum, p) => sum + PASSIVE_MARKETING_CONFIG[p.marketing.passiveLevel].cashPerWeek,
+			0
+		)
+);
 
 export const totalWeeklyExpenses = derived(game, ($game) => {
 	const selfCost = $game.expenses.weeklySelfCost;
 	const hostingCost = $game.projects
 		.filter((p) => p.status === 'shipped' && p.hostingType === 'external')
 		.reduce((sum, p) => sum + p.hostingCostPerWeek, 0);
-	return selfCost + hostingCost;
+	const marketingCost = $game.projects
+		.filter((p) => p.status === 'shipped')
+		.reduce(
+			(sum, p) => sum + PASSIVE_MARKETING_CONFIG[p.marketing.passiveLevel].cashPerWeek,
+			0
+		);
+	return selfCost + hostingCost + marketingCost;
 });
 
 export const researchWeeksRemaining = derived(game, ($game) => {

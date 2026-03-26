@@ -38,7 +38,13 @@ function migrateSave(raw: GameState): GameState {
 			version: p.version ?? '1.0',
 			parentProjectId: p.parentProjectId ?? null,
 			isMajorRelease: p.isMajorRelease ?? false,
-			archivedWeek: p.archivedWeek ?? null
+			archivedWeek: p.archivedWeek ?? null,
+			// Marketing spec
+			marketing: p.marketing ?? {
+				passiveLevel: 'none',
+				activeCampaign: null,
+				campaignHistory: []
+			}
 		}))
 	};
 	// Add upfrontCost to research tree nodes if missing (merge with defaults)

@@ -4,9 +4,15 @@
 	import { game } from '$lib/stores/gameStore';
 	import { availableWu } from '$lib/stores/derived';
 	import { PROJECT_TYPES, HOSTING_EXTERNAL_COST, HOSTING_WU_DRAIN } from '$lib/engine/projects';
+	import {
+		PASSIVE_MARKETING_CONFIG,
+		CAMPAIGN_DEFINITIONS,
+		isCampaignEffectActive,
+		isCampaignInvesting
+	} from '$lib/engine/marketing';
 	import FeatureProgress from '$lib/components/FeatureProgress.svelte';
 	import RevenueChart from '$lib/components/RevenueChart.svelte';
-	import type { Notification, Bug } from '$lib/types';
+	import type { Notification, Bug, MarketingLevel, CampaignType } from '$lib/types';
 
 	const id = $derived(page.params.id);
 	const project = $derived($game.projects.find((p) => p.id === id));
@@ -180,6 +186,99 @@
 
 	function bugWuCost(bug: Bug): number {
 		return bug.severity === 'critical' ? 10 : bug.severity === 'major' ? 5 : 2;
+	}
+
+	// Marketing helpers
+	let showCampaignCancel = $state(false);
+
+	const passiveLevels: MarketingLevel[] = ['none', 'low', 'medium', 'high'];
+	const passiveLevelLabels: Record<MarketingLevel, string> = {
+		none: 'None', low: 'Low', medium: 'Medium', high: 'High'
+	};
+
+	function wuAfterPassive(level: MarketingLevel): number {
+		const newDrain = PASSIVE_MARKETING_CONFIG[level].wuPerWeek;
+		const currentDrain = project
+			? PASSIVE_MARKETING_CONFIG[project.marketing.passiveLevel].wuPerWeek
+			: 0;
+		return $availableWu - newDrain + currentDrain;
+	}
+
+	function setPassiveLevel(level: MarketingLevel) {
+		if (!project) return;
+		game.update((s) => ({
+			...s,
+			projects: s.projects.map((p) =>
+				p.id === id
+					? { ...p, marketing: { ...p.marketing, passiveLevel: level } }
+					: p
+			)
+		}));
+	}
+
+	function launchCampaign(type: CampaignType) {
+		if (!project) return;
+		const def = CAMPAIGN_DEFINITIONS.find((c) => c.type === type);
+		if (!def) return;
+		game.update((s) => ({
+			...s,
+			meta: { ...s.meta, cash: s.meta.cash - def.cashCost },
+			projects: s.projects.map((p) => {
+				if (p.id !== id) return p;
+				return {
+					...p,
+					marketing: {
+						...p.marketing,
+						activeCampaign: {
+							id: crypto.randomUUID(),
+							type,
+							wuRequired: def.wuRequired,
+							wuInvested: 0,
+							cashCost: def.cashCost,
+							weekStarted: s.meta.week,
+							effect: { ...def.effect },
+							weeksRemaining: null
+						},
+						campaignHistory: [...p.marketing.campaignHistory, type]
+					}
+				};
+			}),
+			notifications: (
+				[
+					{
+						id: crypto.randomUUID(),
+						week: s.meta.week,
+						message: `📣 "${project.name}" — ${def.label} launched! ${def.cashCost > 0 ? `-$${def.cashCost.toLocaleString()} upfront. ` : ''}${def.wuRequired} WU over ~${def.wuRequired} weeks.`,
+						type: 'info'
+					} satisfies Notification,
+					...s.notifications
+				] as Notification[]
+			).slice(0, 50)
+		}));
+	}
+
+	function cancelCampaign() {
+		if (!project) return;
+		game.update((s) => ({
+			...s,
+			projects: s.projects.map((p) =>
+				p.id === id
+					? { ...p, marketing: { ...p.marketing, activeCampaign: null } }
+					: p
+			),
+			notifications: (
+				[
+					{
+						id: crypto.randomUUID(),
+						week: s.meta.week,
+						message: `❌ "${project.name}" campaign cancelled. Cash cost is non-refundable.`,
+						type: 'warning'
+					} satisfies Notification,
+					...s.notifications
+				] as Notification[]
+			).slice(0, 50)
+		}));
+		showCampaignCancel = false;
 	}
 
 	function severityColor(severity: Bug['severity']): string {
@@ -425,6 +524,149 @@
 					Lifetime Revenue: <span class="font-mono text-gray-400"
 						>${Math.round(project.totalRevenue).toLocaleString()}</span
 					>
+				</div>
+			</div>
+		{/if}
+
+		<!-- Marketing -->
+		{#if project.status === 'shipped'}
+			<div class="rounded-xl bg-navy-700 p-4">
+				<div class="mb-3 text-xs font-semibold tracking-widest text-gray-500 uppercase">Marketing</div>
+
+				<!-- Passive Marketing -->
+				<div class="mb-4">
+					<div class="mb-2 flex items-center justify-between">
+						<span class="text-sm font-medium text-white">Passive Marketing</span>
+						<span class="text-xs text-gray-500">
+							{PASSIVE_MARKETING_CONFIG[project.marketing.passiveLevel].wuPerWeek} WU/wk ·
+							${PASSIVE_MARKETING_CONFIG[project.marketing.passiveLevel].cashPerWeek}/wk
+						</span>
+					</div>
+					<div class="bg-navy-600 flex rounded-lg p-0.5 gap-0.5">
+						{#each passiveLevels as level}
+							{@const cfg = PASSIVE_MARKETING_CONFIG[level]}
+							{@const isActive = project.marketing.passiveLevel === level}
+							{@const newWu = wuAfterPassive(level)}
+							<button
+								onclick={() => setPassiveLevel(level)}
+								title={level !== 'none' ? `+${cfg.growthBoost * 100}% growth · -${cfg.decayReduction}%/wk decay · ${cfg.wuPerWeek} WU/wk · $${cfg.cashPerWeek}/wk` : 'No passive marketing'}
+								class="flex-1 rounded py-1.5 text-xs font-medium transition-colors"
+								class:bg-neon={isActive}
+								class:text-white={isActive}
+								class:text-gray-400={!isActive}
+							>
+								{passiveLevelLabels[level]}
+								{#if newWu < 0 && !isActive}
+									<span class="block text-red-400 text-[10px]">⚠</span>
+								{/if}
+							</button>
+						{/each}
+					</div>
+					{#if project.marketing.passiveLevel !== 'none'}
+						{@const cfg = PASSIVE_MARKETING_CONFIG[project.marketing.passiveLevel]}
+						<div class="mt-2 flex gap-3 text-xs text-gray-400">
+							<span class="text-green-400">+{cfg.growthBoost * 100}% growth</span>
+							<span class="text-blue-400">-{cfg.decayReduction}%/wk decay</span>
+						</div>
+					{/if}
+					{#if wuAfterPassive(project.marketing.passiveLevel) < 0}
+						<p class="mt-1 text-xs text-red-400">⚠️ WU overcommitted — reduce marketing or self-hosting</p>
+					{/if}
+				</div>
+
+				<!-- Active Campaign -->
+				<div>
+					<div class="mb-2 text-sm font-medium text-white">Campaign</div>
+
+					{#if !project.marketing.activeCampaign}
+						<!-- No campaign: show campaign cards -->
+						<div class="space-y-2">
+							{#each CAMPAIGN_DEFINITIONS as def}
+								{@const alreadyUsed = def.type === 'product_hunt_launch' && project.marketing.campaignHistory.includes('product_hunt_launch')}
+								{@const canAfford = $game.meta.cash >= def.cashCost}
+								<div class="rounded-xl border border-navy-500 p-3 {alreadyUsed ? 'opacity-40' : ''}">
+									<div class="mb-1 flex items-center justify-between">
+										<span class="text-sm font-medium text-white">{def.label}</span>
+										<button
+											onclick={() => launchCampaign(def.type)}
+											disabled={alreadyUsed || !canAfford}
+											class="rounded px-3 py-1 text-xs font-semibold transition-colors"
+											class:bg-neon={!alreadyUsed && canAfford}
+											class:text-white={!alreadyUsed && canAfford}
+											class:bg-navy-500={alreadyUsed || !canAfford}
+											class:text-gray-500={alreadyUsed || !canAfford}
+											class:cursor-not-allowed={alreadyUsed || !canAfford}
+										>
+											{alreadyUsed ? 'Used' : !canAfford ? 'No cash' : 'Launch'}
+										</button>
+									</div>
+									<div class="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400">
+										<span class="font-mono">{def.wuRequired} WU</span>
+										{#if def.cashCost > 0}
+											<span class="text-amber-400">-${def.cashCost.toLocaleString()} upfront</span>
+										{:else}
+											<span class="text-green-400">Free</span>
+										{/if}
+										<span class="text-green-400">+{def.effect.growthMultiplier * 100}% growth</span>
+										<span class="text-blue-400">-{def.effect.decayReduction}%/wk decay</span>
+										<span class="text-gray-500">{def.effect.durationWeeks}wk effect</span>
+									</div>
+									{#if def.type === 'product_hunt_launch' && !alreadyUsed}
+										<p class="mt-0.5 text-xs text-purple-400">Once per product</p>
+									{/if}
+								</div>
+							{/each}
+						</div>
+
+					{:else if isCampaignInvesting(project)}
+						<!-- Campaign investing WU -->
+						{@const campaign = project.marketing.activeCampaign}
+						{@const def = CAMPAIGN_DEFINITIONS.find((c) => c.type === campaign.type)}
+						<div class="rounded-xl border border-yellow-700 bg-yellow-950/40 p-3">
+							<div class="mb-2 flex items-center justify-between">
+								<span class="text-sm font-semibold text-yellow-300">{def?.label ?? campaign.type}</span>
+								<span class="font-mono text-xs text-gray-400">{campaign.wuInvested}/{campaign.wuRequired} WU</span>
+							</div>
+							<div class="mb-2 h-2 w-full overflow-hidden rounded-full bg-navy-600">
+								<div
+									class="h-full rounded-full bg-yellow-500 transition-all"
+									style="width: {(campaign.wuInvested / campaign.wuRequired) * 100}%"
+								></div>
+							</div>
+							<div class="mb-2 text-xs text-gray-400">
+								Effect starts in ~{campaign.wuRequired - campaign.wuInvested} week(s) ·
+								<span class="text-green-400">+{campaign.effect.growthMultiplier * 100}% growth</span> ·
+								<span class="text-blue-400">-{campaign.effect.decayReduction}%/wk decay</span> for {campaign.effect.durationWeeks}wk
+							</div>
+							{#if showCampaignCancel}
+								<div class="rounded-lg border border-red-800 bg-red-950 p-2 text-xs">
+									<p class="mb-2 text-red-300">Cash cost is non-refundable. Cancel campaign?</p>
+									<div class="flex gap-2">
+										<button onclick={() => (showCampaignCancel = false)} class="flex-1 rounded border border-gray-600 py-1 text-gray-300">Keep</button>
+										<button onclick={cancelCampaign} class="flex-1 rounded bg-red-700 py-1 font-semibold text-white">Cancel</button>
+									</div>
+								</div>
+							{:else}
+								<button onclick={() => (showCampaignCancel = true)} class="text-xs text-red-400 hover:text-red-300 transition-colors">
+									Cancel campaign (cash non-refundable)
+								</button>
+							{/if}
+						</div>
+
+					{:else if isCampaignEffectActive(project)}
+						<!-- Effect running -->
+						{@const campaign = project.marketing.activeCampaign}
+						{@const def = CAMPAIGN_DEFINITIONS.find((c) => c.type === campaign?.type)}
+						<div class="rounded-xl border border-green-700 bg-green-950/40 p-3">
+							<div class="mb-1 text-sm font-semibold text-green-300">
+								📣 {def?.label ?? campaign?.type} active — {campaign?.weeksRemaining} week(s) remaining
+							</div>
+							<div class="flex flex-wrap gap-x-3 text-xs">
+								<span class="text-green-400">+{(campaign?.effect.growthMultiplier ?? 0) * 100}% growth</span>
+								<span class="text-blue-400">-{campaign?.effect.decayReduction}%/wk decay</span>
+							</div>
+						</div>
+					{/if}
 				</div>
 			</div>
 		{/if}

@@ -71,6 +71,39 @@ export interface PatchJob {
 	weekStarted: number;
 }
 
+export type MarketingLevel = 'none' | 'low' | 'medium' | 'high';
+
+export type CampaignType =
+	| 'social_media_blitz'
+	| 'press_release'
+	| 'influencer_deal'
+	| 'product_hunt_launch'
+	| 'paid_ads'
+	| 'content_marketing';
+
+export interface CampaignEffect {
+	growthMultiplier: number;
+	decayReduction: number;
+	durationWeeks: number;
+}
+
+export interface Campaign {
+	id: string;
+	type: CampaignType;
+	wuRequired: number;
+	wuInvested: number;
+	cashCost: number;
+	weekStarted: number;
+	effect: CampaignEffect;
+	weeksRemaining: number | null;
+}
+
+export interface MarketingState {
+	passiveLevel: MarketingLevel;
+	activeCampaign: Campaign | null;
+	campaignHistory: CampaignType[];
+}
+
 export interface Project {
 	id: string;
 	name: string;
@@ -117,6 +150,8 @@ export interface Project {
 	weekStarted: number;
 	weekShipped: number | null;
 	techRequired: string[];
+
+	marketing: MarketingState;
 }
 
 export interface ResearchNode {

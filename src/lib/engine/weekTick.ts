@@ -3,6 +3,13 @@ import { calcInitialRevenue, calcInitialSubscribers, tickShippedProject } from '
 import { maybeFireEvent } from './events';
 import { LAPTOP_TIERS, HOSTING_EXTERNAL_COST, HOSTING_WU_DRAIN, NEEDS_HOSTING, AD_RATE_PER_USER } from './projects';
 import { generateBug, calcBugsThisWeek, checkEscalation, completePatch, calcWeeklyTraffic } from './bugs';
+import {
+	PASSIVE_MARKETING_CONFIG,
+	CAMPAIGN_DEFINITIONS,
+	calcEffectiveDecayReduction,
+	calcEffectiveGrowthMultiplier,
+	isCampaignInvesting
+} from './marketing';
 
 function getBaseLaptopWu(state: GameState): number {
 	return LAPTOP_TIERS[state.expenses.laptopTier].wuPerWeek;
@@ -14,11 +21,25 @@ function getSelfHostingWuDrain(state: GameState): number {
 		.reduce((sum, p) => sum + p.hostingWuDrainPerWeek, 0);
 }
 
+function getPassiveMarketingWuDrain(state: GameState): number {
+	return state.projects
+		.filter((p) => p.status === 'shipped')
+		.reduce((sum, p) => sum + PASSIVE_MARKETING_CONFIG[p.marketing.passiveLevel].wuPerWeek, 0);
+}
+
+function getCampaignWuDrain(state: GameState): number {
+	return state.projects
+		.filter((p) => p.status === 'shipped' && isCampaignInvesting(p))
+		.length; // 1 WU/wk per active campaign being invested
+}
+
 function getAvailableWu(state: GameState): number {
 	const base = getBaseLaptopWu(state);
 	const agileBonus = state.research.completed.includes('agile_process') ? 1 : 0;
-	const drain = getSelfHostingWuDrain(state);
-	return base + agileBonus - drain;
+	const selfHostDrain = getSelfHostingWuDrain(state);
+	const passiveMarketingDrain = getPassiveMarketingWuDrain(state);
+	const campaignDrain = getCampaignWuDrain(state);
+	return base + agileBonus - selfHostDrain - passiveMarketingDrain - campaignDrain;
 }
 
 function getRpPerWeek(): number {
@@ -213,8 +234,31 @@ export function advanceWeek(state: GameState): GameState {
 		return proj;
 	});
 
-	// 6. Deduct external hosting costs + apply outage risk for self-hosted; collect revenue
+	// 6. Advance active campaign WU per product (1 WU/wk each)
+	s.projects = s.projects.map((p) => {
+		if (p.status !== 'shipped' || !p.marketing.activeCampaign) return p;
+		const campaign = { ...p.marketing.activeCampaign };
+		if (campaign.wuInvested < campaign.wuRequired) {
+			campaign.wuInvested += 1;
+			if (campaign.wuInvested >= campaign.wuRequired) {
+				// Campaign complete — activate effect
+				campaign.weeksRemaining = campaign.effect.durationWeeks;
+				s.notifications = [
+					makeNotif(
+						week,
+						`📣 "${p.name}" — ${CAMPAIGN_DEFINITIONS.find((c) => c.type === campaign.type)?.label ?? campaign.type} campaign complete! Effect active for ${campaign.effect.durationWeeks} weeks.`,
+						'success'
+					),
+					...s.notifications
+				].slice(0, 50);
+			}
+		}
+		return { ...p, marketing: { ...p.marketing, activeCampaign: campaign } };
+	});
+
+	// 7. Deduct external hosting costs + apply outage risk for self-hosted; collect revenue
 	let externalHostingTotal = 0;
+	let passiveMarketingCashTotal = 0;
 	let weeklyIncome = 0;
 
 	s.projects = s.projects.map((p) => {
@@ -240,8 +284,10 @@ export function advanceWeek(state: GameState): GameState {
 			s.meta.cash -= p.hostingCostPerWeek;
 		}
 
-		// Tick revenue
-		let ticked = tickShippedProject(p);
+		// Tick revenue with marketing modifiers
+		const decayReduction = calcEffectiveDecayReduction(p);
+		const growthMultiplier = calcEffectiveGrowthMultiplier(p);
+		let ticked = tickShippedProject(p, decayReduction, growthMultiplier);
 
 		// Apply bug revenue impact (each bug's revenueImpact is a fraction of weekly revenue)
 		const unfixedBugs = ticked.bugs.filter((b) => !b.fixed);
@@ -270,34 +316,55 @@ export function advanceWeek(state: GameState): GameState {
 		}
 		ticked = { ...ticked, adRevenue };
 
+		// Passive marketing cash cost
+		const passiveCashCost = PASSIVE_MARKETING_CONFIG[p.marketing.passiveLevel].cashPerWeek;
+		passiveMarketingCashTotal += passiveCashCost;
+
 		weeklyIncome += ticked.weeklyRevenue + adRevenue;
 		return ticked;
+	});
+
+	// 8. Deduct passive marketing cash costs
+	s.meta.cash -= passiveMarketingCashTotal;
+
+	// 9. Tick down active campaign effect durations (after revenue applied)
+	s.projects = s.projects.map((p) => {
+		if (p.status !== 'shipped' || !p.marketing.activeCampaign) return p;
+		const campaign = { ...p.marketing.activeCampaign };
+		if (campaign.weeksRemaining !== null) {
+			campaign.weeksRemaining--;
+			if (campaign.weeksRemaining <= 0) {
+				return { ...p, marketing: { ...p.marketing, activeCampaign: null } };
+			}
+		}
+		return { ...p, marketing: { ...p.marketing, activeCampaign: campaign } };
 	});
 
 	s.meta.cash += weeklyIncome;
 	s.meta.totalEarned += weeklyIncome;
 
-	// 7. Check escalation thresholds (bugs → reputation damage / death)
+	// 10. Check escalation thresholds (bugs → reputation damage / death)
 	s = checkEscalation(s);
 
-	// 8. Weekly expense summary notification
-	const netChange = weeklyIncome - selfCost - externalHostingTotal;
+	// 11. Weekly expense summary notification
+	const netChange = weeklyIncome - selfCost - externalHostingTotal - passiveMarketingCashTotal;
 	const sign = netChange >= 0 ? '+' : '';
+	const marketingLine = passiveMarketingCashTotal > 0 ? ` · Marketing: -$${passiveMarketingCashTotal.toLocaleString()}` : '';
 	s.notifications = [
 		makeNotif(
 			week,
-			`📊 Week ${week} — Revenue: +$${Math.round(weeklyIncome).toLocaleString()} · Living: -$${selfCost.toLocaleString()} · Hosting: -$${externalHostingTotal.toLocaleString()} · Net: ${sign}$${Math.round(netChange).toLocaleString()}`,
+			`📊 Week ${week} — Revenue: +$${Math.round(weeklyIncome).toLocaleString()} · Living: -$${selfCost.toLocaleString()} · Hosting: -$${externalHostingTotal.toLocaleString()}${marketingLine} · Net: ${sign}$${Math.round(netChange).toLocaleString()}`,
 			netChange >= 0 ? 'info' : 'warning'
 		),
 		...s.notifications
 	].slice(0, 50);
 
-	// 9. WU warning if overloaded
+	// 12. WU warning if overloaded
 	if (availableWu <= 0) {
 		s.notifications = [
 			makeNotif(
 				week,
-				`⚠️ No WU available — self-hosting overhead is consuming all your time.`,
+				`⚠️ WU overcommitted — reduce marketing or self-hosting.`,
 				'danger'
 			),
 			...s.notifications

@@ -7,7 +7,11 @@
 		activeResearch,
 		researchWeeksRemaining,
 		totalWeeklyExpenses,
-		availableWu
+		availableWu,
+		wuPerWeek,
+		selfHostingWuDrain,
+		passiveMarketingWuDrain,
+		campaignWuDrain
 	} from '$lib/stores/derived';
 	import StatChip from '$lib/components/StatChip.svelte';
 	import ProjectCard from '$lib/components/ProjectCard.svelte';
@@ -70,6 +74,7 @@
 	}
 
 	let showReset = $state(false);
+	let showWuBreakdown = $state(false);
 
 	function handleReset() {
 		if (showReset) {
@@ -124,10 +129,50 @@
 		<StatChip label="Expenses/wk" value="-${$totalWeeklyExpenses.toLocaleString()}" />
 	</div>
 
+	<!-- WU Chip + Breakdown -->
+	<button
+		onclick={() => (showWuBreakdown = !showWuBreakdown)}
+		class="w-full rounded-lg bg-navy-700 px-3 py-2 text-left transition-colors hover:bg-navy-600"
+	>
+		<div class="flex items-center justify-between">
+			<span class="text-xs text-gray-400">WU this week</span>
+			<div class="flex items-center gap-2">
+				<span class="font-mono text-sm font-bold" class:text-neon={$availableWu > 0} class:text-red-400={$availableWu <= 0}>
+					{$availableWu} available
+				</span>
+				<span class="text-xs text-gray-600">{showWuBreakdown ? '▲' : '▼'}</span>
+			</div>
+		</div>
+		{#if showWuBreakdown}
+			<div class="mt-2 space-y-1 border-t border-navy-500 pt-2 text-xs text-gray-400">
+				<div class="flex justify-between">
+					<span>Total</span>
+					<span class="font-mono text-white">{$wuPerWeek} WU</span>
+				</div>
+				<div class="flex justify-between">
+					<span>Self-hosting</span>
+					<span class="font-mono text-orange-400">-{$selfHostingWuDrain} WU</span>
+				</div>
+				<div class="flex justify-between">
+					<span>Marketing (passive)</span>
+					<span class="font-mono text-purple-400">-{$passiveMarketingWuDrain} WU</span>
+				</div>
+				<div class="flex justify-between">
+					<span>Marketing (campaigns)</span>
+					<span class="font-mono text-purple-400">-{$campaignWuDrain} WU</span>
+				</div>
+				<div class="flex justify-between border-t border-navy-500 pt-1">
+					<span>Available for dev</span>
+					<span class="font-mono font-bold" class:text-neon={$availableWu > 0} class:text-red-400={$availableWu <= 0}>{$availableWu} WU</span>
+				</div>
+			</div>
+		{/if}
+	</button>
+
 	<!-- WU Warning -->
 	{#if $availableWu <= 0}
 		<div class="rounded-xl border border-red-700 bg-red-950 px-4 py-3 text-sm text-red-300">
-			⚠️ No WU available — self-hosting overhead is consuming all your time.
+			⚠️ WU overcommitted — reduce marketing or self-hosting.
 		</div>
 	{/if}
 
