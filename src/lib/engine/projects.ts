@@ -809,35 +809,35 @@ export const PLATFORM_CONVERSION_RATES: Partial<Record<ProjectType, number>> = {
 // Map: apiFeatureId → { subProductType → featureIds[] }
 export const API_FEATURE_UNLOCK_MAP: Record<string, Partial<Record<ProjectType, string[]>>> = {
 	api_auth: {
-		mobile_app: ['ma_user_auth', 'ma_purchases'],
-		saas: ['saas_auth_teams', 'saas_admin'],
-		desktop_app: ['da_cloud_sync', 'da_auto_updater']
+		mobile_app: ['ma_auth', 'ma_iap'],
+		saas: ['saas_auth', 'saas_admin'],
+		desktop_app: ['da_sync', 'da_updater']
 	},
 	api_webhooks: {
-		mobile_app: ['ma_social_share', 'ma_analytics'],
-		saas: ['saas_webhooks', 'saas_email_notif'],
-		desktop_app: ['da_plugin_system']
+		mobile_app: ['ma_social', 'ma_analytics'],
+		saas: ['saas_webhooks', 'saas_email'],
+		desktop_app: ['da_plugins']
 	},
 	api_analytics: {
 		mobile_app: ['ma_analytics'],
-		saas: ['saas_dashboards', 'saas_funnel_reports']
+		saas: ['saas_admin']
 	},
 	api_sdks: {
-		mobile_app: ['ma_offline', 'ma_push_notif'],
-		saas: ['saas_rest_api', 'saas_csv_export', 'saas_data_export'],
-		desktop_app: ['da_keyboard_shortcuts', 'da_multi_lang']
+		mobile_app: ['ma_offline', 'ma_push'],
+		saas: ['saas_api', 'saas_csv'],
+		desktop_app: ['da_shortcuts', 'da_i18n']
 	},
 	api_graphql: {
-		mobile_app: ['ma_in_app_chat'],
-		saas: ['saas_ai_automation']
+		mobile_app: ['ma_chat'],
+		saas: ['saas_ai']
 	},
 	api_admin: {
-		mobile_app: ['ma_dark_mode', 'ma_social_share'],
-		saas: ['saas_custom_branding'],
-		desktop_app: ['da_dark_mode']
+		mobile_app: ['ma_dark', 'ma_social'],
+		saas: ['saas_branding'],
+		desktop_app: ['da_dark']
 	},
 	api_rate_limit: {
-		desktop_app: ['da_offline', 'da_auto_updater']
+		desktop_app: ['da_offline', 'da_updater']
 	}
 };
 
